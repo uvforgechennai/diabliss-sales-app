@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSN &amp; EAN Codes — Diabliss</title>
+<style>
+  :root { --bg:#f4f6f9; --w:#fff; --bd:#e5e9f0; --t1:#1a1a2e; --t2:#555; --t3:#888; --g:#28a745; --b:#159ADB; --rad:12px; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--t1); min-height:100vh; }
+  .header { background:var(--b); color:#fff; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+  .header h1 { font-size:15px; font-weight:700; }
+  .header-sub { font-size:11px; opacity:0.85; margin-top:2px; }
+  .actions { display:flex; gap:8px; padding:12px 14px; background:var(--w); border-bottom:1px solid var(--bd); }
+  .btn { padding:8px 14px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; }
+  .btn-primary { background:var(--b); color:#fff; }
+  .btn-outline { background:transparent; border:1px solid var(--bd); color:var(--t1); }
+  .table-wrap { overflow-x:auto; padding:0 0 80px; }
+  table { border-collapse:collapse; font-size:11px; min-width:700px; width:100%; }
+  thead tr { background:#e8f4fd; }
+  th { padding:8px 10px; text-align:left; border-bottom:2px solid var(--bd); font-size:10px; font-weight:700; color:var(--t2); white-space:nowrap; }
+  td { padding:8px 10px; border-bottom:1px solid var(--bd); vertical-align:middle; }
+  tr:nth-child(even) td { background:#fafbfd; }
+  td.mono { font-family:monospace; font-size:11px; }
+  td.center { text-align:center; }
+  .copy-cell { cursor:pointer; }
+  .copy-cell:active { background:#d4edff; }
+  .sno { color:var(--t3); text-align:center; width:30px; }
+  .product-name { font-weight:500; min-width:180px; }
+  .category-head td { background:#e8f4fd; font-weight:700; font-size:10px; color:var(--b); padding:5px 10px; letter-spacing:0.5px; }
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#222; color:#fff; padding:8px 18px; border-radius:20px; font-size:12px; opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:999; }
+  .toast.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header h1" style="font-size:15px;font-weight:700">HSN &amp; EAN Codes</div>
+    <div class="header-sub">Diabliss Consumer Products · 22 SKUs</div>
+  </div>
+</div>
+
+<div class="actions">
+  <button class="btn btn-primary" onclick="shareAll()">📤 Share via WhatsApp</button>
+  <button class="btn btn-outline" onclick="copyAll()">📋 Copy All</button>
+</div>
+
+<div class="table-wrap">
+  <table id="hsn-table">
+    <thead>
+      <tr>
+        <th class="sno">#</th>
+        <th>Product</th>
+        <th class="center">MRP</th>
+        <th class="center">GST%</th>
+        <th class="center">Case Qty</th>
+        <th class="center">Shelf Life</th>
+        <th class="center">HSN Code</th>
+        <th class="center">EAN No</th>
+      </tr>
+    </thead>
+    <tbody id="hsn-tbody"></tbody>
+  </table>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = [
+  {cat:'Sugar', sno:1,  name:'Diabliss Sugar 500g Standy Pouch',              mrp:'₹160',    gst:'5%',  caseQty:24, shelf:'24 months', hsn:'17011490', ean:'8908003545004'},
+  {cat:'Sugar', sno:2,  name:'Diabliss Sugar 40×5g Sachet Box',               mrp:'₹99',     gst:'5%',  caseQty:54, shelf:'24 months', hsn:'17011490', ean:'8908003545011'},
+  {cat:'Sugar', sno:3,  name:'Diabliss Sugar 1kg Jar',                         mrp:'₹295',    gst:'5%',  caseQty:12, shelf:'24 months', hsn:'17011490', ean:'8908003545790'},
+  {cat:'Sugar', sno:4,  name:'Diabliss Sugar 1.75kg Jar',                      mrp:'₹365',    gst:'5%',  caseQty:6,  shelf:'24 months', hsn:'17011490', ean:'8906161001776'},
+  {cat:'Sugar', sno:5,  name:'Diabliss Sugar 5kg Bag',                         mrp:'₹1,250',  gst:'5%',  caseQty:10, shelf:'24 months', hsn:'17011490', ean:'8908003545875'},
+  {cat:'Sugar', sno:6,  name:'Diabliss Sugar 10kg Bag',                        mrp:'₹2,300',  gst:'5%',  caseQty:5,  shelf:'24 months', hsn:'17011490', ean:'—'},
+  {cat:'Sugar', sno:7,  name:'Diabliss Sugar 25kg Bag',                        mrp:'₹5,000',  gst:'5%',  caseQty:1,  shelf:'24 months', hsn:'17011490', ean:'8906161001752'},
+  {cat:'Jaggery', sno:8,  name:'Diabliss Jaggery Powder 750g Jar',            mrp:'₹225',    gst:'5%',  caseQty:12, shelf:'12 months', hsn:'17011410', ean:'8908003545813'},
+  {cat:'Jaggery', sno:9,  name:'Diabliss Jaggery Powder 500g Pouch',          mrp:'₹160',    gst:'5%',  caseQty:24, shelf:'12 months', hsn:'17011410', ean:'8908003545868'},
+  {cat:'Jaggery', sno:10, name:'Diabliss Sugar 1.25kg Jar',                   mrp:'₹499',    gst:'5%',  caseQty:24, shelf:'12 months', hsn:'17011410', ean:'8906161001783'},
+  {cat:'Tea',    sno:11, name:'Diabliss Lemon Tea 500g Pouch',                 mrp:'₹241',    gst:'5%',  caseQty:24, shelf:'12 months', hsn:'21012010', ean:'8908003545097'},
+  {cat:'Tea',    sno:12, name:'Diabliss Lemon Tea 30×10g Sachet Box',          mrp:'₹201',    gst:'5%',  caseQty:36, shelf:'12 months', hsn:'21012010', ean:'8908003545035'},
+  {cat:'Tea',    sno:13, name:'Diabliss Lemon Tea 10×10g Sachet Box',          mrp:'₹76',     gst:'5%',  caseQty:84, shelf:'12 months', hsn:'21012010', ean:'8908003545042'},
+  {cat:'Tea',    sno:14, name:'Diabliss Ginger Tea 10×10g Sachet Box',         mrp:'₹89',     gst:'5%',  caseQty:84, shelf:'12 months', hsn:'21012010', ean:'8908003545370'},
+  {cat:'Tea',    sno:15, name:'Diabliss Masala Tea 10×10g Sachet Box',         mrp:'₹89',     gst:'5%',  caseQty:84, shelf:'12 months', hsn:'21012010', ean:'8908003545387'},
+  {cat:'Tea',    sno:16, name:'Diabliss Herbal Tea 30×10g Combo Box',          mrp:'₹223',    gst:'5%',  caseQty:36, shelf:'12 months', hsn:'21012010', ean:'8908003545523'},
+  {cat:'Jam',    sno:17, name:'Diabliss Mixed Fruit Jam 225g',                 mrp:'₹215',    gst:'12%', caseQty:24, shelf:'12 months', hsn:'20079990', ean:'8908003545066'},
+  {cat:'Jam',    sno:18, name:'Diabliss Guava Jam 225g',                       mrp:'₹225',    gst:'12%', caseQty:24, shelf:'12 months', hsn:'20079990', ean:'8906161000601'},
+  {cat:'Jam',    sno:19, name:'Diabliss Pineapple Ginger Jam 225g',            mrp:'₹235',    gst:'12%', caseQty:24, shelf:'12 months', hsn:'20079990', ean:'8906161000618'},
+  {cat:'Cookies',sno:20, name:'Diabliss Millet Cookies 120g',                  mrp:'₹80',     gst:'5%',  caseQty:60, shelf:'6 months',  hsn:'19059090', ean:'8908003545691'},
+  {cat:'Cookies',sno:21, name:'Diabliss Millet Cookies with Chia Seeds 120g', mrp:'₹89',     gst:'5%',  caseQty:60, shelf:'6 months',  hsn:'19059090', ean:'8908003545684'},
+  {cat:'Cookies',sno:22, name:'Diabliss Millet Cookies with Moringa Leaf 120g',mrp:'₹89',    gst:'5%',  caseQty:60, shelf:'6 months',  hsn:'19059090', ean:'8908003545677'},
+];
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function copyCell(txt) {
+  navigator.clipboard?.writeText(txt).then(() => toast('Copied: ' + txt)).catch(() => toast(txt));
+}
+
+function render() {
+  const tb = document.getElementById('hsn-tbody');
+  let html = ''; let lastCat = '';
+  DATA.forEach(r => {
+    if (r.cat !== lastCat) {
+      html += `<tr class="category-head"><td colspan="8">${r.cat.toUpperCase()}</td></tr>`;
+      lastCat = r.cat;
+    }
+    html += `<tr>
+      <td class="sno">${r.sno}</td>
+      <td class="product-name copy-cell" onclick="copyCell('${r.name.replace(/'/g,"\\'")}'">${r.name}</td>
+      <td class="center copy-cell" onclick="copyCell('${r.mrp}')">${r.mrp}</td>
+      <td class="center">${r.gst}</td>
+      <td class="center">${r.caseQty}</td>
+      <td class="center">${r.shelf}</td>
+      <td class="mono center copy-cell" onclick="copyCell('${r.hsn}')">${r.hsn}</td>
+      <td class="mono center copy-cell" onclick="copyCell('${r.ean}')">${r.ean}</td>
+    </tr>`;
+  });
+  tb.innerHTML = html;
+}
+
+function copyAll() {
+  const header = '#\tProduct\tMRP\tGST%\tCase Qty\tShelf Life\tHSN Code\tEAN No\n';
+  const rows = DATA.map(r => `${r.sno}\t${r.name}\t${r.mrp}\t${r.gst}\t${r.caseQty}\t${r.shelf}\t${r.hsn}\t${r.ean}`).join('\n');
+  navigator.clipboard?.writeText(header + rows).then(() => toast('All 22 rows copied ✅')).catch(() => toast('Copy not supported'));
+}
+
+function shareAll() {
+  const txt = '*Diabliss HSN & EAN Codes*\n\n' +
+    DATA.map(r => `${r.sno}. ${r.name}\n   MRP: ${r.mrp} | GST: ${r.gst} | Case: ${r.caseQty} | HSN: ${r.hsn} | EAN: ${r.ean}`).join('\n\n');
+  if (navigator.share) {
+    navigator.share({ title: 'Diabliss HSN & EAN Codes', text: txt }).catch(() =>
+      window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank'));
+  } else {
+    window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+  }
+}
+
+render();
+</script>
+</body>
+</html>

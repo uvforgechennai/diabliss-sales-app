@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#159ADB">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="permissions-policy" content="geolocation=()">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DL Sales">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="https://lowgifoods.co.in/diabliss-sales-app/Diabliss_Logo-01.png">
+<link rel="apple-touch-icon" href="https://lowgifoods.co.in/diabliss-sales-app/Diabliss_Logo-01.png">
+<title>Diabliss Sales App</title>
+<link rel="stylesheet" href="app.css">
+<style>
+/* Android nav bar safe area fix */
+.bot-nav{padding-bottom:env(safe-area-inset-bottom,0px)!important}
+#app-loader{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+#app-loader img{width:140px;height:auto}
+#app-loader .ld-txt{font-size:13px;color:#888;font-family:sans-serif}
+#app-loader .ld-bar{width:180px;height:4px;background:#e0e0e0;border-radius:2px;overflow:hidden}
+#app-loader .ld-fill{height:100%;width:0%;background:#159ADB;border-radius:2px;animation:ldfill 2.5s ease forwards}
+@keyframes ldfill{0%{width:0%}60%{width:70%}90%{width:90%}100%{width:100%}}
+
+/* ══ ANIMATIONS v1.6.12 ══ */
+
+/* Tab slide-in */
+.tab.on { animation: tabSlideIn 0.15s ease forwards; }
+@keyframes tabSlideIn { from { opacity:0; transform:translateX(12px); } to { opacity:1; transform:translateX(0); } }
+
+/* Toast slide-up */
+@keyframes toastSlideUp { from { opacity:0; transform:translateY(20px) translateX(-50%); } to { opacity:1; transform:translateY(0) translateX(-50%); } }
+@keyframes toastFadeOut { from { opacity:1; } to { opacity:0; } }
+#toast.show { animation: toastSlideUp 0.25s ease forwards; }
+#toast.hide { animation: toastFadeOut 0.3s ease forwards; }
+
+/* Button ripple — body-level fixed position, avoids any CSS conflicts */
+@keyframes rippleAnim {
+  0%   { transform: scale(0);  opacity: 0.7; }
+  100% { transform: scale(8);  opacity: 0; }
+}
+
+/* Quick action hover/active */
+.quick-action {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border-left: 3px solid #159ADB;
+}
+.quick-action:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Card fade-in */
+@keyframes cardFadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.card-anim { animation: cardFadeIn 0.25s ease forwards; }
+
+/* Day banner pulse when active */
+.day-banner.active-day {
+  animation: dayGlow 2.5s ease-in-out infinite;
+}
+@keyframes dayGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+  50% { box-shadow: 0 0 0 6px rgba(46, 204, 113, 0.18); }
+}
+
+/* Home stat counter */
+@keyframes statPop { 0% { transform:scale(0.7); opacity:0; } 70% { transform:scale(1.1); } 100% { transform:scale(1); opacity:1; } }
+.stat-pop { animation: statPop 0.4s cubic-bezier(.34,1.56,.64,1) forwards; }
+
+/* Order submit celebration */
+@keyframes celebFlash {
+  0%   { background: rgba(46,204,113,0); }
+  20%  { background: rgba(46,204,113,0.25); }
+  60%  { background: rgba(46,204,113,0.1); }
+  100% { background: rgba(46,204,113,0); }
+}
+.celebrate { animation: celebFlash 0.8s ease forwards; }
+
+/* Milestone banner pop */
+@keyframes milestonePop {
+  0%   { transform: scale(0.85); opacity:0; }
+  70%  { transform: scale(1.04); }
+  100% { transform: scale(1); opacity:1; }
+}
+.milestone-anim { animation: milestonePop 0.4s cubic-bezier(.34,1.56,.64,1) forwards; }
+
+/* Role home greeting card entrance */
+@keyframes greetSlide { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+.greet-anim { animation: greetSlide 0.35s ease forwards; }
+
+/* Pulse ring on check-in CTA */
+@keyframes pulseRing { 0%{transform:scale(.96);opacity:.55} 100%{transform:scale(1.06);opacity:0} }
+.pulse-ring-btn { position:relative; overflow:hidden; }
+.pulse-ring-btn::after { content:''; position:absolute; inset:0; border-radius:var(--rads); border:2px solid #159ADB; animation:pulseRing 1.8s ease-out infinite; pointer-events:none; }
+
+/* Flame streak pulse */
+@keyframes flamePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+.flame-pulse { display:inline-block; animation:flamePulse 1.2s ease-in-out infinite; }
+
+/* Badge pill */
+.rank-badge { display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;margin-top:4px; }
+.rank-badge.gold { background:#FAEEDA;color:#633806; }
+.rank-badge.silver { background:#F1EFE8;color:#444441; }
+.rank-badge.bronze { background:#FAECE7;color:#4A1B0C; }
+.rank-badge.new { background:#E6F1FB;color:#0C447C; }
+
+/* Visit progress bar */
+.visit-prog-track { height:7px;background:#eee;border-radius:99px;overflow:hidden; }
+.visit-prog-fill { height:100%;border-radius:99px;width:0%;transition:width 1.2s cubic-bezier(.22,1,.36,1); }
+
+/* KPI count-up — no extra CSS needed, JS handles values */
+
+/* Order success overlay */
+@keyframes checkPop { 0%{transform:scale(0);opacity:0} 70%{transform:scale(1.2)} 100%{transform:scale(1);opacity:1} }
+.order-success-check { animation:checkPop 0.45s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes successFadeUp { 0%{opacity:0;transform:translateY(10px)} 100%{opacity:1;transform:translateY(0)} }
+.order-success-text { animation:successFadeUp 0.4s 0.25s ease both; }
+.order-success-sub { animation:successFadeUp 0.4s 0.4s ease both; }
+
+/* Confetti piece */
+.dl-confetti { position:absolute;width:8px;height:8px;border-radius:2px;opacity:0;pointer-events:none; }
+
+/* Morning briefing stagger */
+@keyframes briefSlideIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.brief-card-anim { opacity:0; }
+.brief-card-anim.visible { animation:briefSlideIn 0.4s ease forwards; }
+
+/* Typewriter cursor */
+@keyframes twBlink { 50%{opacity:0} }
+.tw-cursor { display:inline-block;width:2px;height:13px;background:var(--t1,#159ADB);margin-left:2px;vertical-align:middle;animation:twBlink 0.7s step-end infinite; }
+
+/* Slide-up sheet */
+@keyframes sheetUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+.sheet-open { animation: sheetUp 0.3s ease forwards; }
+
+/* Files tab */
+.files-section-hdr { display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--g); }
+.files-section-hdr span { font-size:14px;font-weight:700;color:var(--gd); }
+
+/* Product photo album grid */
+.ph-album-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px; }
+.ph-album-card { position:relative;border-radius:var(--rad);overflow:hidden;cursor:pointer;aspect-ratio:1;background:var(--bg);box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:transform 0.15s ease; }
+.ph-album-card:active { transform:scale(0.97); }
+.ph-album-card img { width:100%;height:100%;object-fit:cover;display:block; }
+.ph-album-label { position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));color:#fff;padding:20px 8px 8px;font-size:12px;font-weight:600; }
+.ph-album-count { font-size:10px;font-weight:400;opacity:0.85; }
+
+/* Photo gallery overlay */
+@keyframes galleryIn { from{opacity:0;transform:scale(0.96)} to{opacity:1;transform:scale(1)} }
+#ph-gallery { animation: galleryIn 0.2s ease forwards; }
+.ph-gallery-img { width:100%;max-height:65vh;object-fit:contain;display:block;border-radius:var(--rad); }
+
+/* Files stagger animation */
+@keyframes filesFadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.files-anim { opacity:0; }
+.files-anim.visible { animation:filesFadeUp 0.35s ease forwards; }
+</style>
+</head>
+<body>
+<div id="app-loader">
+  <img src="https://lowgifoods.co.in/diabliss-sales-app/Diabliss_Logo-01.png" alt="Diabliss" onerror="this.style.display='none'">
+  <div class="ld-bar"><div class="ld-fill"></div></div>
+  <div class="ld-txt">Loading Diabliss Sales App…</div>
+</div>
+
+<!-- ══ ONBOARDING ══ -->
+<div id="p-onboard" class="page" style="padding:0;background:#fff;display:flex;flex-direction:column;min-height:100vh">
+  <div style="background:#fff;padding:28px 24px 18px;text-align:center;border-bottom:1px solid #E3EDF7">
+    <img src="Diabliss_Logo-01.png" alt="Diabliss" style="width:160px;height:auto;margin-bottom:6px" onerror="this.style.display='none'">
+    <div style="font-size:16px;font-weight:700;color:#0D1B2A;line-height:1.4">Your complete field sales<br>companion — built for speed.</div>
+  </div>
+  <div style="padding:10px 18px;flex:1">
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid #E3EDF7"><div style="width:34px;height:34px;border-radius:8px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">🏪</div><div><div style="font-size:13px;font-weight:700;color:#0D1B2A">Smart store visits</div><div style="font-size:11px;color:#5A7184;margin-top:1px;line-height:1.4">Store visits with shelf audit, damaged &amp; expired stock reporting</div></div></div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid #E3EDF7"><div style="width:34px;height:34px;border-radius:8px;background:#EDE7F6;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">🤖</div><div><div style="font-size:13px;font-weight:700;color:#0D1B2A">AI order suggestions</div><div style="font-size:11px;color:#5A7184;margin-top:1px;line-height:1.4">Smart recommendations based on store history + quick reorder</div></div></div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid #E3EDF7"><div style="width:34px;height:34px;border-radius:8px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">🧾</div><div><div style="font-size:13px;font-weight:700;color:#0D1B2A">Proforma invoice in 1 min</div><div style="font-size:11px;color:#5A7184;margin-top:1px;line-height:1.4">GST-ready with margins. Download &amp; share instantly</div></div></div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid #E3EDF7"><div style="width:34px;height:34px;border-radius:8px;background:#FFF8E1;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">📊</div><div><div style="font-size:13px;font-weight:700;color:#0D1B2A">Live dashboard &amp; MIS</div><div style="font-size:11px;color:#5A7184;margin-top:1px;line-height:1.4">Targets, leaderboard, territory scorecards — real time</div></div></div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid #E3EDF7"><div style="width:34px;height:34px;border-radius:8px;background:#FCE4EC;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">📒</div><div><div style="font-size:13px;font-weight:700;color:#0D1B2A">Party ledger</div><div style="font-size:11px;color:#5A7184;margin-top:1px;line-height:1.4">Pull your distributor ledger yourself, anytime</div></div></div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid #E3EDF7"><div style="width:34px;height:34px;border-radius:8px;background:#E0F2F1;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">📅</div><div><div style="font-size:13px;font-weight:700;color:#0D1B2A">Attendance &amp; expenses</div><div style="font-size:11px;color:#5A7184;margin-top:1px;line-height:1.4">Start/end day, route plan, claim expenses with bill photos</div></div></div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid #E3EDF7"><div style="width:34px;height:34px;border-radius:8px;background:#E8EAF6;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">📁</div><div><div style="font-size:13px;font-weight:700;color:#0D1B2A">Files &amp; product photos</div><div style="font-size:11px;color:#5A7184;margin-top:1px;line-height:1.4">Catalogues, price lists, product photos — share in one tap</div></div></div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0"><div style="width:34px;height:34px;border-radius:8px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">🔄</div><div><div style="font-size:13px;font-weight:700;color:#0D1B2A">Territory handover</div><div style="font-size:11px;color:#5A7184;margin-top:1px;line-height:1.4">Clean, documented handover — zero confusion</div></div></div>
+  </div>
+  <div style="padding:0 18px 32px">
+    <button class="btn" style="background:#1565C0;border-color:#1565C0;width:100%;padding:14px;font-size:15px;font-weight:700" onclick="gotoPage('p-location-guide')">Get started →</button>
+  </div>
+</div>
+
+<!-- ══ LOCATION INSTRUCTIONS ══ -->
+<div id="p-location-guide" class="page" style="padding:0;background:#fff;display:flex;flex-direction:column;min-height:100vh">
+  <div style="background:#fff;padding:24px 24px 16px;text-align:center;border-bottom:1px solid #E3EDF7">
+    <img src="Diabliss_Logo-01.png" alt="Diabliss" style="width:130px;height:auto;margin-bottom:14px" onerror="this.style.display='none'">
+    <div style="font-size:17px;font-weight:700;color:#0D1B2A;margin-bottom:4px">3 permissions required</div>
+    <div style="font-size:12px;color:#5A7184;line-height:1.5">The app needs these to work.<br>Follow each step carefully.</div>
+  </div>
+  <div style="padding:14px 18px;flex:1">
+
+    <div style="background:#F0F7FF;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #BBDEFB">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:20px">📍</span>
+        <span style="font-size:13px;font-weight:700;color:#0D1B2A">Location</span>
+      </div>
+      <div style="background:#1565C0;color:#fff;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-align:center;margin-bottom:6px">✅ Select — While using the app</div>
+      <div style="font-size:11px;color:#C62828;margin-bottom:2px">❌ Don't select — Only this time</div>
+      <div style="font-size:11px;color:#C62828;margin-bottom:6px">❌ Don't select — Don't allow</div>
+      <div style="background:#FFF8E1;border-radius:6px;padding:6px 8px;font-size:10px;color:#7A4F00;line-height:1.5">⚙️ Wrong choice? Settings → Apps → Diabliss Sales → Permissions → Location → Allow while using</div>
+    </div>
+
+    <div style="background:#F0F7FF;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #BBDEFB">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:20px">📷</span>
+        <span style="font-size:13px;font-weight:700;color:#0D1B2A">Camera</span>
+      </div>
+      <div style="background:#1565C0;color:#fff;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-align:center;margin-bottom:6px">✅ Select — Allow</div>
+      <div style="font-size:11px;color:#C62828;margin-bottom:6px">❌ Don't select — Don't allow</div>
+      <div style="background:#FFF8E1;border-radius:6px;padding:6px 8px;font-size:10px;color:#7A4F00;line-height:1.5">⚙️ Wrong choice? Settings → Apps → Diabliss Sales → Permissions → Camera → Allow</div>
+    </div>
+
+    <div style="background:#F0F7FF;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #BBDEFB">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:20px">🔔</span>
+        <span style="font-size:13px;font-weight:700;color:#0D1B2A">Notifications</span>
+      </div>
+      <div style="background:#1565C0;color:#fff;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-align:center;margin-bottom:6px">✅ Select — Allow</div>
+      <div style="font-size:11px;color:#C62828;margin-bottom:6px">❌ Don't select — Don't allow</div>
+      <div style="background:#FFF8E1;border-radius:6px;padding:6px 8px;font-size:10px;color:#7A4F00;line-height:1.5">⚙️ Wrong choice? Settings → Apps → Diabliss Sales → Permissions → Notifications → Allow</div>
+    </div>
+
+  </div>
+  <div style="padding:0 18px 32px">
+    <button class="btn" style="background:#1565C0;border-color:#1565C0;width:100%;padding:14px;font-size:15px;font-weight:700" onclick="gotoRegister()">I've allowed all 3 — continue →</button>
+  </div>
+</div>
+
+<!-- ══ REGISTER ══ -->
+<div id="p-register" class="page" style="padding:0;background:#fff;display:flex;flex-direction:column;min-height:100vh">
+  <div style="background:#fff;padding:22px 24px 14px;text-align:center;border-bottom:1px solid #E3EDF7">
+    <img src="Diabliss_Logo-01.png" alt="Diabliss" style="width:130px;height:auto;margin-bottom:10px" onerror="this.style.display='none'">
+    <div style="font-size:17px;font-weight:700;color:#0D1B2A;margin-bottom:2px">Set up your profile</div>
+    <div style="font-size:12px;color:#5A7184">Fill once. Appears on every order you submit.</div>
+  </div>
+  <div style="padding:16px 18px;flex:1">
+    <div style="font-size:10px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Your details</div>
+    <div class="field"><label>Full name <span class="req">*</span></label><input type="text" id="r-name" placeholder="e.g. Ramesh Kumar" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"></div>
+    <div class="field"><label>Mobile number <span class="req">*</span></label><input type="tel" id="r-mobile" placeholder="10-digit number" maxlength="13" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"></div>
+    <div class="field"><label>Employee ID</label><input type="text" id="r-empid" placeholder="Optional" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"></div>
+    <div style="font-size:10px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 10px">Your territory</div>
+    <div class="field"><label>Territory <span class="req">*</span></label>
+      <select id="r-territory">
+        <option value="">-- Select territory --</option>
+        <option>Chennai</option><option>ROTN</option><option>Kerala</option>
+        <option>AP</option><option>TS</option><option>Bangalore</option>
+        <option>ROK</option><option>Odisha</option><option>Others</option>
+      </select>
+    </div>
+    <div class="field"><label>City / Area</label><input type="text" id="r-city" placeholder="e.g. Anna Nagar" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"></div>
+    <div style="font-size:10px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 10px">Set your PIN</div>
+    <div class="field"><label>4-digit PIN <span class="req">*</span></label><input type="password" id="r-pin" maxlength="4" inputmode="numeric" placeholder="Choose PIN" class="pin-inp" style="font-size:22px;letter-spacing:8px;padding:12px" autocomplete="new-password"></div>
+    <div class="field"><label>Confirm PIN <span class="req">*</span></label><input type="password" id="r-pin2" maxlength="4" inputmode="numeric" placeholder="Repeat PIN" class="pin-inp" style="font-size:22px;letter-spacing:8px;padding:12px" autocomplete="new-password"></div>
+  </div>
+  <div style="padding:0 18px 32px">
+    <button class="btn" style="background:#1565C0;border-color:#1565C0;width:100%;padding:14px;font-size:15px;font-weight:700;margin-bottom:10px" onclick="registerUser()">Register →</button>
+    <button class="btn-out" style="width:100%;padding:12px;font-size:13px;border-color:#1565C0;color:#1565C0" onclick="gotoPage('p-login')">Already registered? Login</button>
+  </div>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div id="p-login" class="page" style="padding:0;background:#fff;display:flex;flex-direction:column;min-height:100vh">
+  <div style="background:#fff;padding:28px 24px 18px;text-align:center;border-bottom:1px solid #E3EDF7">
+    <img src="Diabliss_Logo-01.png" alt="Diabliss" style="width:140px;height:auto;margin-bottom:10px" onerror="this.style.display='none'">
+    <div style="font-size:17px;font-weight:700;color:#0D1B2A;margin-bottom:2px">Welcome back</div>
+    <div style="font-size:12px;color:#5A7184">Enter your details to continue</div>
+  </div>
+  <div style="padding:24px 18px;flex:1">
+    <div style="font-size:10px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Your details</div>
+    <div class="field">
+      <label>Mobile number <span class="req">*</span></label>
+      <input type="tel" id="login-mobile" maxlength="10" inputmode="numeric" pattern="[0-9]*" placeholder="10-digit mobile number" autocomplete="off" style="font-size:16px;padding:12px;cursor:pointer;caret-color:transparent" readonly onclick="document.getElementById('_numpad')?.remove();showNumPad('login-mobile',10)">
+    </div>
+    <div class="field" id="login-pin-field">
+      <label>PIN <span class="req">*</span></label>
+      <input type="password" id="pin-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="4-digit PIN" class="pin-inp" style="font-size:22px;letter-spacing:8px;padding:12px;cursor:pointer;caret-color:transparent" autocomplete="current-password" readonly onclick="document.getElementById('_numpad')?.remove();showNumPad('pin-input',4)">
+    </div>
+    <div style="text-align:right;margin-top:-8px;margin-bottom:20px">
+      <span onclick="forgotPIN()" style="font-size:12px;color:#1565C0;cursor:pointer">Forgot PIN?</span>
+    </div>
+  </div>
+  <div style="padding:0 18px 32px">
+    <button class="btn" style="background:#1565C0;border-color:#1565C0;width:100%;padding:14px;font-size:15px;font-weight:700;margin-bottom:10px" onclick="pinLogin()">Login →</button>
+    <button class="btn-out" id="biometric-login-btn" style="display:none;width:100%;padding:12px;font-size:13px;border-color:#1565C0;color:#1565C0;margin-bottom:10px" onclick="biometricLogin()">👤 Face / Fingerprint login</button>
+    <button class="btn-out" style="width:100%;padding:12px;font-size:13px;border-color:#1565C0;color:#1565C0" onclick="gotoPage('p-register')">Register new account</button>
+  </div>
+</div>
+
+<!-- ══ DENIED ══ -->
+<div id="p-denied" class="page" style="text-align:center;padding:60px 24px">
+  <div style="font-size:56px;margin-bottom:16px">🔒</div>
+  <div style="font-size:20px;font-weight:700;color:var(--r);margin-bottom:12px">Access denied</div>
+  <div id="denied-msg" style="font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:28px"></div>
+  <div style="font-size:13px;color:var(--t3)">Contact: Pethachi · Diabliss Operations</div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="p-app" class="page flex-page">
+  <div class="app-hdr">
+    <!-- Back panel — shown when drilling into sub-panels -->
+    <div id="hdr-back-panel" style="display:none;align-items:center;gap:8px;padding:8px 14px">
+      <button id="hdr-back-btn" onclick="appGoBack()" style="background:none;border:none;cursor:pointer;font-size:22px;color:#159ADB;line-height:1;padding:0;flex-shrink:0" title="Go back">‹</button>
+      <div id="hdr-title-text" style="font-size:16px;font-weight:700;color:#0D1B2A;flex:1"></div>
+    </div>
+    <!-- Logo + officer — shown normally -->
+    <div id="hdr-logo-box" style="position:relative;padding:5px 12px 4px">
+      <!-- ⚙️ absolute right, centred vertically across full block -->
+      <div id="profile-avatar" onclick="toggleProfileMenu()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:#F0F4F8;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;border:1.5px solid #D1D9E0;z-index:5" title="Profile and settings">⚙️</div>
+      <!-- Logo centred, right padding to not go behind gear -->
+      <div style="text-align:center;padding:0 40px">
+        <img src="https://lowgifoods.co.in/diabliss-sales-app/Diabliss_Logo_App_Top.png" alt="Diabliss" style="height:22px;width:90px;object-fit:fill;display:inline-block" onerror="this.src='https://lowgifoods.co.in/diabliss-sales-app/Diabliss_Logo-01.png'">
+      </div>
+      <!-- Officer name centred -->
+      <div style="text-align:center;padding:2px 40px 0;">
+        <div id="hdr-user" style="line-height:1.3;font-weight:700"></div>
+      </div>
+    </div>
+    <!-- Profile dropdown -->
+    <div id="profile-menu" style="display:none;position:fixed;top:56px;right:12px;background:var(--w);border:1px solid var(--bd);border-radius:var(--rad);padding:6px;min-width:200px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.12)">
+      <div style="padding:10px 10px 8px;border-bottom:1px solid var(--bd);margin-bottom:4px">
+        <div style="font-size:14px;font-weight:600" id="pm-name"></div>
+        <div style="font-size:11px;color:var(--t2);margin-top:2px" id="pm-role"></div>
+      </div>
+      <div class="pm-item" onclick="closeProfileMenu();switchTab('settings')">
+        <span>🔑</span><span>Change PIN</span>
+      </div>
+      <div class="pm-item" onclick="toggleDark();updateDarkMenuItem()">
+        <span id="pm-dark-icon">🌙</span><span id="pm-dark-label">Dark mode</span>
+        <div id="pm-dark-tog" class="tog" style="margin-left:auto;width:34px;height:19px"></div>
+      </div>
+      <div class="pm-item" id="pm-biometric-item" onclick="toggleBiometricSetting()">
+        <span>👤</span><span id="pm-bio-label">Face / Fingerprint login</span>
+        <div id="pm-bio-tog" class="tog" style="margin-left:auto;width:34px;height:19px"></div>
+      </div>
+      <div style="height:1px;background:var(--bd);margin:4px 0"></div>
+      <div class="pm-item" onclick="closeProfileMenu();logoutUser()" style="color:var(--r)">
+        <span>🚪</span><span>Log out</span>
+      </div>
+      <div style="padding:6px 10px 4px;font-size:10px;color:var(--t3)" id="pm-version"></div>
+    </div>
+  </div>
+
+  <div class="app-body">
+
+    <!-- HOME TAB -->
+    <div id="tab-home" class="tab on">
+      <!-- Offline indicator -->
+      <div id="offline-banner" style="display:none;background:#333;color:#fff;border-radius:var(--rad);padding:10px 14px;margin-bottom:10px;align-items:center;gap:10px">
+        <div style="font-size:18px;flex-shrink:0">📵</div>
+        <div>
+          <div style="font-size:13px;font-weight:600">No internet connection</div>
+          <div style="font-size:11px;opacity:0.8;margin-top:2px">Orders are saved locally and will sync when connected.</div>
+        </div>
+      </div>
+
+      <!-- Sync status -->
+      <div id="sync-banner" style="display:none;background:var(--al);border:1px solid #ffc107;border-radius:var(--rad);padding:10px 14px;margin-bottom:10px;cursor:pointer" onclick="syncPendingOrders()">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:18px;flex-shrink:0">🔄</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--a)" id="sync-count-text">Orders pending sync</div>
+            <div style="font-size:11px;color:var(--a);margin-top:2px">Tap to sync now</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Holiday banner -->
+      <div id="holiday-banner" style="display:none;background:#F0EBF8;border:1px solid #C4A8E8;border-radius:var(--rad);padding:11px 14px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:20px;flex-shrink:0">🎉</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#4B2D8E" id="holiday-name">Holiday</div>
+            <div style="font-size:11px;color:#6B4DAE;margin-top:2px">Today is a holiday — attendance auto-marked</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Broadcast banner -->
+      <div id="broadcast-banner" style="display:none;background:var(--bl);border:1px solid #bdd7f5;border-radius:var(--rad);padding:12px 14px;margin-bottom:12px">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div style="font-size:20px;flex-shrink:0">📢</div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600;color:var(--b);margin-bottom:3px">Notice from management</div>
+            <div style="font-size:13px;color:var(--t)" id="broadcast-text"></div>
+          </div>
+          <button onclick="dismissBroadcast()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;padding:0;flex-shrink:0">×</button>
+        </div>
+      </div>
+
+      <!-- Location warning banner -->
+      <div id="loc-warning" style="display:none;background:var(--rl);border:1px solid #f7c1c1;border-radius:var(--rad);padding:12px 14px;margin-bottom:12px;cursor:pointer" onclick="openLocationSettings()">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:22px;flex-shrink:0">⚠️</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--r)">Location access needed for store navigation</div>
+            <div style="font-size:12px;color:#791F1F;margin-top:2px">Tap here to enable → Settings → Apps → Diabliss Sales → Permissions → Location → <strong>While using the app</strong></div>
+          </div>
+        </div>
+      </div>
+
+    <div id="start-day-reminder-banner" style="display:none;background:var(--al);border:1px solid #ffc107;border-radius:var(--rad);padding:12px 13px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:20px;flex-shrink:0" onclick="switchTab('day')">⏰</div>
+          <div style="flex:1;cursor:pointer" onclick="switchTab('day')">
+            <div style="font-size:13px;font-weight:600;color:var(--a)">Haven't started your day yet</div>
+            <div style="font-size:12px;color:var(--a);margin-top:2px">It's past 10 AM — tap here to start your day.</div>
+          </div>
+          <button onclick="document.getElementById('start-day-reminder-banner').style.display='none'" style="background:none;border:none;color:var(--a);cursor:pointer;font-size:18px;padding:0;flex-shrink:0;opacity:0.7">×</button>
+        </div>
+      </div>
+
+      <div id="end-day-reminder-banner" style="display:none;background:var(--al);border:1px solid #ffc107;border-radius:var(--rad);padding:12px 13px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:20px;flex-shrink:0" onclick="switchTab('day')">⏰</div>
+          <div style="flex:1;cursor:pointer" onclick="switchTab('day')">
+            <div style="font-size:13px;font-weight:600;color:var(--a)">Don't forget to end your day</div>
+            <div style="font-size:12px;color:var(--a);margin-top:2px">It's past 7 PM and today's day hasn't been ended yet — tap here to close it out.</div>
+          </div>
+          <button onclick="document.getElementById('end-day-reminder-banner').style.display='none'" style="background:none;border:none;color:var(--a);cursor:pointer;font-size:18px;padding:0;flex-shrink:0;opacity:0.7">×</button>
+        </div>
+      </div>
+
+      <div class="day-banner idle" id="day-banner" style="display:none">
+        <div>
+          <div style="font-size:13px;font-weight:600" id="day-status-txt">Day not started</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:2px" id="day-status-sub">Tap to start your day</div>
+        </div>
+        <div style="font-size:24px" id="day-status-icon">⬜</div>
+      </div>
+      <div class="stat-grid" id="home-stats" style="display:none">
+        <div class="stat stat-blue" style="cursor:pointer" onclick="switchTab('orders')" title="View today's orders"><div class="stat-n" id="hs-orders">0</div><div class="stat-l">Orders</div></div>
+        <div class="stat stat-green" style="cursor:pointer" onclick="switchTab('visit')" title="Stores visited today"><div class="stat-n" id="hs-visits">0</div><div class="stat-l">Visits</div></div>
+        <div class="stat stat-amber" style="cursor:pointer" onclick="switchTab('master')" title="View stores"><div class="stat-n" id="hs-stores">0</div><div class="stat-l">Stores</div></div>
+        <div class="stat stat-purple" style="cursor:pointer" onclick="switchTab('dashboard')" title="View dashboard"><div class="stat-n" id="hs-value">₹0</div><div class="stat-l">Value</div></div>
+      </div>
+      <!-- Monthly target reminder card -->
+      <div id="target-progress-card" style="display:none;border-radius:var(--rad);padding:14px;margin-bottom:14px" class="target-card-green">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div>
+            <div style="font-size:12px;font-weight:600;opacity:0.8" id="target-month-label">June target</div>
+            <div style="font-size:22px;font-weight:700;margin-top:2px" id="target-progress-pct">0%</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;opacity:0.8">Achieved</div>
+            <div style="font-size:15px;font-weight:700" id="target-achieved">₹0</div>
+          </div>
+        </div>
+        <div style="height:6px;background:rgba(255,255,255,0.3);border-radius:3px;overflow:hidden;margin-bottom:8px">
+          <div id="target-prog-fill" style="height:100%;border-radius:3px;background:rgba(255,255,255,0.9);transition:width .5s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:11px;opacity:0.8" id="target-progress-label">₹0 of ₹0</div>
+          <div style="font-size:11px;font-weight:600;background:rgba(255,255,255,0.2);padding:3px 8px;border-radius:10px" id="target-days-left"></div>
+        </div>
+        <div id="target-urgency-msg" style="margin-top:8px;font-size:12px;font-weight:600;background:rgba(0,0,0,0.15);padding:6px 10px;border-radius:6px;display:none"></div>
+        <div id="target-incentive-msg" style="margin-top:6px;font-size:12px;opacity:0.9;display:none"></div>
+      </div>
+
+      <div id="officer-quick-actions">
+      <div class="slabel">Quick actions</div>
+
+      <!-- Day action — toggles Start/End day (label updated by refreshDayActionBtn) -->
+      <div class="quick-action qa-green" id="day-action-card" onclick="handleDayAction()">
+        <div class="qa-icon" style="background:#EAF3DE" id="day-action-icon">🌅</div>
+        <div><div class="qa-title" id="day-action-title">Start my day</div><div class="qa-sub" id="day-action-sub">Enter route plan for today</div></div>
+      </div>
+
+      <div class="quick-action qa-blue" onclick="switchTab('visit')">
+        <div class="qa-icon" style="background:#DCF0FB">🏪</div>
+        <div><div class="qa-title">New store visit</div><div class="qa-sub">Order booking, stock audit, institution pitch</div></div>
+      </div>
+
+      <div class="quick-action qa-amber" onclick="switchTab('invoice')">
+        <div class="qa-icon" style="background:#FAEEDA">🧾</div>
+        <div><div class="qa-title">Primary Order / Proforma Invoice</div><div class="qa-sub">Generate invoice</div></div>
+      </div>
+
+      <div class="quick-action qa-teal" onclick="switchTab('orders')">
+        <div class="qa-icon" style="background:#E6F1FB">📋</div>
+        <div><div class="qa-title">My orders</div><div class="qa-sub">View, share or edit recent orders</div></div>
+      </div>
+
+      <div class="quick-action qa-purple" onclick="switchTab('files')">
+        <div class="qa-icon" style="background:#F0EBF8">📁</div>
+        <div><div class="qa-title">Files and documents</div><div class="qa-sub">Catalogues, price lists, my files</div></div>
+      </div>
+
+      <div class="quick-action qa-teal" onclick="if(typeof openDayRouteMap==='function')openDayRouteMap();else switchTab('visit')">
+        <div class="qa-icon" style="background:#E8F5E9">📍</div>
+        <div><div class="qa-title">View route map</div><div class="qa-sub">Today's visited stores on map</div></div>
+      </div>
+
+      <div class="quick-action qa-purple" onclick="if(typeof addAISummaryButton==='function'){addAISummaryButton();}">
+        <div class="qa-icon" style="background:#F3E5F5">🤖</div>
+        <div><div class="qa-title">AI: Summarise my day</div><div class="qa-sub">Smart summary of today's activity</div></div>
+      </div>
+
+      <div class="quick-action qa-red" onclick="switchTab('day');setTimeout(()=>document.getElementById('leave-section').scrollIntoView({behavior:'smooth'}),300)">
+        <div class="qa-icon" style="background:#FCEBEB">🏖️</div>
+        <div><div class="qa-title">Mark leave</div><div class="qa-sub">Notify your manager via email</div></div>
+      </div>
+      </div><!-- end officer-quick-actions -->
+
+      <div style="text-align:center;padding:16px 0 4px;font-size:11px;color:var(--t3)">
+        Diabliss Sales App <span id="app-version-display">v—</span> <span style='font-size:9px;color:var(--t3);margin-left:4px' id="app-build-info"></span><br>
+        <span style="font-size:10px">© Diabliss Consumer Products Pvt Ltd</span>
+      </div>
+    </div>
+
+    <!-- VISIT TAB -->
+    <div id="tab-visit" class="tab">
+      <div class="steps">
+        <div class="swrap" onclick="if(VS&&VS.step>1)goStep(1)" style="cursor:pointer"><div class="sdot active" id="sd1">1</div><div class="slbl">Visit</div></div>
+        <div class="sline" id="sl1"></div>
+        <div class="swrap" onclick="if(VS&&VS.step>2)goStep(2)" style="cursor:pointer"><div class="sdot active" id="sd2">2</div><div class="slbl">Audit</div></div>
+        <div class="sline" id="sl2"></div>
+        <div class="swrap" onclick="if(VS&&VS.step>3)goStep(3)" style="cursor:pointer"><div class="sdot pend" id="sd3">3</div><div class="slbl">Order</div></div>
+        <div class="sline" id="sl3"></div>
+        <div class="swrap"><div class="sdot pend" id="sd4">4</div><div class="slbl">Done</div></div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div id="vs1">
+        <div class="slabel" style="margin-top:0">Visit type</div>
+        <div style="display:flex;gap:6px;margin-bottom:14px">
+          <div class="ist on" id="vt-order" onclick="setVisitType('order')">📦 Order</div>
+          <div class="ist" id="vt-prospect" onclick="setVisitType('prospect')">🎯 Prospect</div>
+<div class="ist" id="vt-institution" onclick="setVisitType('institution')">🏢 Institution</div>
+        </div>
+
+        <div id="store-section">
+          <div class="slabel">Store</div>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="search-inp" type="text" id="store-search" placeholder="Search store or add new..." autocomplete="off" oninput="filterStores()" onfocus="filterStores()" onblur="setTimeout(()=>hideDrops(),200)">
+            <div class="search-drop" id="store-drop"></div>
+          </div>
+          <div id="store-selected" style="display:none"></div>
+          <div id="store-visit-history" style="display:none"></div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button class="btn-out btn-sm" onclick="showAddStore()" style="flex:1">+ Add new store</button>
+            <button id="route-optimize-btn" class="btn-out btn-sm" onclick="optimizeRoute()" style="flex:1">🗺️ Optimize Route</button>
+          </div>
+          <div id="add-store-form" style="display:none" class="add-form">
+            <div class="add-form-title">Add new store</div>
+            <div class="field"><label>Store name <span class="req">*</span></label><input type="text" id="ns-name" autocomplete="off"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:12px;color:var(--t2);font-weight:500">Address, city &amp; pincode</span>
+              <button type="button" id="ns-geo-btn" onclick="autoFillStoreAddress()" style="background:var(--g);color:#fff;border:none;border-radius:var(--rads);font-size:11px;padding:5px 10px;cursor:pointer;display:flex;align-items:center;gap:4px">📍 Get location</button>
+            </div>
+            <div id="ns-geo-status" style="font-size:11px;color:var(--t3);margin-bottom:6px;display:none"></div>
+            <input type="hidden" id="ns-lat" value="">
+            <input type="hidden" id="ns-lng" value="">
+            <div class="field"><input type="text" id="ns-addr" placeholder="Address" autocomplete="off"></div>
+            <div class="field-row">
+              <div class="field"><input type="text" id="ns-city" placeholder="City *" autocomplete="off"></div>
+              <div class="field">
+                <select id="ns-territory" onchange="populateDistSelect('ns-distributor', this.value)">
+                  <option value="">Territory *</option>
+                  <option>Chennai</option><option>ROTN</option><option>Kerala</option>
+                  <option>AP</option><option>TS</option><option>Bangalore</option>
+                  <option>ROK</option><option>Odisha</option><option>Others</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><input type="text" id="ns-pincode" inputmode="numeric" maxlength="6" placeholder="Pincode (optional)" autocomplete="off"></div>
+            <div class="field"><label>Contact person</label><input type="text" id="ns-contact" autocomplete="off"></div>
+            <div class="field-row">
+              <div class="field"><label>Phone</label><input type="tel" id="ns-phone"></div>
+              <div class="field"><label>Mobile</label><input type="tel" id="ns-mobile"></div>
+            </div>
+            <div class="field"><label>Email</label><input type="email" id="ns-email" autocomplete="off"></div>
+            <div class="field"><label>GSTIN <span style="font-size:11px;color:var(--t3)">(optional)</span></label><input type="text" id="ns-gstin" placeholder="e.g. 33AABCD1234E1Z5" autocomplete="off" maxlength="15" style="text-transform:uppercase"></div>
+            <div class="field"><label>Store margin %</label>
+              <select id="ns-margin">
+                <option value="">Select margin</option>
+                <option value="10">10%</option><option value="15">15%</option>
+                <option value="20">20%</option><option value="25">25%</option>
+                <option value="30">30%</option>
+                <option value="special">Special price (per order)</option>
+              </select>
+            </div>
+            <div class="field"><label>Distributor / SS <span class="req">*</span></label>
+              <select id="ns-distributor"><option value="">Select distributor</option></select>
+            </div>
+            <div class="slabel">Store front photo <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--r)">camera only</span></div>
+            <div class="photo-box" id="store-photo-box" onclick="openCamera('store-photo-file')">
+              <img id="store-photo-preview" src="" alt="">
+              <div class="photo-ph" id="store-photo-ph">📷 Tap to take photo<small>Must be taken at store location</small></div>
+            </div>
+            <input type="file" id="store-photo-file" accept="image/*" capture="environment" onclick="this.removeAttribute('capture');this.setAttribute('capture','environment')" style="display:none;position:absolute;left:-9999px" onchange="onPhoto(event,'store')">
+            <button class="btn" onclick="saveNewStore()">Save store</button>
+          </div>
+        </div>
+
+        <div id="institution-section" style="display:none">
+          <div class="slabel">Institution</div>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="search-inp" type="text" id="inst-search" placeholder="Search institution or add new..." autocomplete="off" oninput="filterInstitutions()" onfocus="filterInstitutions()" onblur="setTimeout(()=>hideDrops(),200)">
+            <div class="search-drop" id="inst-drop"></div>
+          </div>
+          <div id="inst-selected" style="display:none"></div>
+          <button class="btn-out btn-sm" onclick="showAddInstitution()" style="margin-bottom:12px">+ Add new institution</button>
+          <div id="add-inst-form" style="display:none" class="add-form">
+            <div class="add-form-title">Add institution</div>
+            <div class="field"><label>Institution name <span class="req">*</span></label><input type="text" id="ni-name" autocomplete="off"></div>
+            <div class="field"><label>Type</label>
+              <select id="ni-type">
+                <option>Hospital</option><option>Corporate</option><option>Hotel</option>
+                <option>Canteen</option><option>Bulk buyer</option><option>Other</option>
+              </select>
+            </div>
+            <div class="field"><label>Address</label><input type="text" id="ni-addr" autocomplete="off"></div>
+            <div class="field-row">
+              <div class="field"><label>City <span class="req">*</span></label><input type="text" id="ni-city" autocomplete="off"></div>
+              <div class="field"><label>Territory</label>
+                <select id="ni-territory" onchange="populateDistSelect('ni-distributor', this.value)">
+                  <option value="">Select</option>
+                  <option>Chennai</option><option>ROTN</option><option>Kerala</option>
+                  <option>AP</option><option>TS</option><option>Bangalore</option>
+                  <option>ROK</option><option>Odisha</option><option>Others</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><label>Contact person <span class="req">*</span></label><input type="text" id="ni-contact" autocomplete="off"></div>
+            <div class="field"><label>Department</label><input type="text" id="ni-dept" placeholder="e.g. Purchase, Admin, Canteen" autocomplete="off"></div>
+            <div class="field"><label>Mobile</label><input type="tel" id="ni-mobile"></div>
+            <div class="field"><label>Distributor / SS <span class="req">*</span></label>
+              <select id="ni-distributor"><option value="">Select distributor</option></select>
+            </div>
+            <button class="btn" onclick="saveNewInstitution()">Save institution</button>
+          </div>
+        </div>
+
+        <div id="distributor-section" style="display:none">
+          <div id="dist-safetynet-banner" style="padding:14px;background:var(--al);border:1px solid #ffc107;border-radius:var(--rad);margin-bottom:14px">
+            <div style="font-size:13px;font-weight:700;color:var(--a);margin-bottom:6px">⚠️ No distributor / SS assigned yet</div>
+            <div style="font-size:12px;color:var(--t2)">Select the distributor or SS that supplies this location — this is saved permanently, so it's only needed once.</div>
+          </div>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="search-inp" type="text" id="dist-search" placeholder="Search distributor..." autocomplete="off" oninput="filterDists()" onfocus="filterDists()" onblur="setTimeout(()=>hideDrops(),200)">
+            <div class="search-drop" id="dist-drop"></div>
+          </div>
+          <div id="dist-selected" style="display:none"></div>
+          <button class="btn-out btn-sm" id="dist-safetynet-cancel" style="display:none;margin-bottom:12px" onclick="hideDistSafetyNet()">Cancel</button>
+          <div id="dist-quickadd-wrap" style="display:none">
+          <button class="btn-out btn-sm" onclick="showAddDist()" style="margin-bottom:12px">+ Add new distributor</button>
+          <div id="add-dist-form" style="display:none" class="add-form">
+            <div class="add-form-title">Add distributor</div>
+            <div class="field"><label>Name <span class="req">*</span></label><input type="text" id="nd-name" autocomplete="off"></div>
+            <div class="field"><label>Type</label>
+              <select id="nd-type" onchange="toggleDistPattern(this.value)"><option value="Distributor">Distributor</option><option value="Super Stockist">Super Stockist</option></select>
+            </div>
+            <div class="field" id="nd-pattern-field" style="display:none"><label>Billing pattern</label>
+              <select id="nd-pattern">
+                <option value="">-- Select billing pattern --</option>
+                <option value="TN_KA|25|13|7">TN and KA — 25-13-7</option>
+                <option value="AP_TS|20|10|10">AP and TS — 20-10-10</option>
+                <option value="KL_A|25|13|8">KL — 25-13-8</option>
+                <option value="KL_B|25|13|5">KL — 25-13-5</option>
+                <option value="KL_C|32|13|7">KL — 32-13-7</option>
+                <option value="KL_D|25|13|7">KL — 25-13-7</option>
+                <option value="KL_E|25|13|10">KL — 25-13-10</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <div class="field"><label>Territory <span class="req">*</span></label>
+                <select id="nd-territory">
+                  <option value="">Select</option>
+                  <option>Chennai</option><option>ROTN</option><option>Kerala</option>
+                  <option>AP</option><option>TS</option><option>Bangalore</option>
+                  <option>ROK</option><option>Odisha</option><option>Others</option>
+                </select>
+              </div>
+              <div class="field"><label>City</label><input type="text" id="nd-city" placeholder="Blank=territory-wide" autocomplete="off"></div>
+            </div>
+            <div class="field"><label>Contact person</label><input type="text" id="nd-contact" autocomplete="off"></div>
+            <div class="field"><label>Mobile</label><input type="tel" id="nd-mobile"></div>
+            <div class="field"><label>GSTIN <span class="req">*</span></label><input type="text" id="nd-gstin" placeholder="e.g. 33AABCD1234E1Z5" autocomplete="off" maxlength="15" style="text-transform:uppercase"></div>
+            <div class="field"><label>Address</label><input type="text" id="nd-addr" autocomplete="off"></div>
+            <button class="btn" onclick="saveNewDist()">Save distributor</button>
+          </div>
+          </div>
+        </div>
+
+        <div id="inst-visit-fields" style="display:none">
+          <div class="slabel">Visit details</div>
+          <div class="field"><label>Contact person met</label><input type="text" id="iv-contact" placeholder="Name and designation" autocomplete="off"></div>
+          <div class="slabel">Visit status</div>
+          <div class="inst-status" id="inst-status-pick">
+            <div class="ist on" onclick="setInstStatus('First visit')">First visit</div>
+            <div class="ist" onclick="setInstStatus('Follow-up')">Follow-up</div>
+            <div class="ist" onclick="setInstStatus('Converted')">Converted</div>
+            <div class="ist" onclick="setInstStatus('Lost')">Lost</div>
+          </div>
+          <div class="field"><label>Follow-up date</label><input type="date" id="iv-followup"></div>
+        </div>
+
+        <div class="field"><label>Notes</label><textarea id="v-notes" placeholder="Meeting notes, special requests, feedback..."></textarea></div>
+
+  <button class="btn" id="v-next-btn" onclick="goStep2()">Next: Stock audit →</button>
+        <div id="inst-submit-section" style="display:none">
+          <div class="field"><label>Follow-up required?</label>
+            <select id="visit-followup" onchange="document.getElementById('followup-date-field').style.display=this.value==='custom'?'block':'none'">
+              <option value="">No follow-up needed</option>
+              <option value="1week">Call back in 1 week</option>
+              <option value="2weeks">Call back in 2 weeks</option>
+              <option value="1month">Call back in 1 month</option>
+              <option value="custom">Custom date</option>
+            </select>
+          </div>
+          <div class="field" id="followup-date-field" style="display:none">
+            <label>Follow-up date</label>
+            <input type="date" id="visit-followup-date">
+          </div>
+          <div class="field"><label>Follow-up note</label>
+            <input type="text" id="visit-followup-note" placeholder="e.g. Owner interested, discuss pricing" autocomplete="off">
+          </div>
+          <button class="btn" onclick="submitInstitutionVisit()">Submit visit</button>
+        </div>
+      </div>
+
+      <!-- PROSPECT SECTION -->
+      <div id="prospect-section" style="display:none">
+        <div class="slabel">Prospect details</div>
+        <div class="field"><label>Prospect name <span class="req">*</span></label><input type="text" id="pr-name" placeholder="e.g. Raju Traders" autocomplete="off"></div>
+        <div class="field-row">
+          <div class="field"><label>Type <span class="req">*</span></label>
+            <select id="pr-type">
+              <option value="Distributor">Distributor</option>
+              <option value="Super Stockist">Super Stockist</option>
+              <option value="Retailer">Retailer</option>
+              <option value="Institution">Institution</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field"><label>Interest level</label>
+            <select id="pr-interest">
+              <option value="Hot">🔥 Hot</option>
+              <option value="Warm">🌤 Warm</option>
+              <option value="Cold">❄️ Cold</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>City <span class="req">*</span></label><input type="text" id="pr-city" autocomplete="off"></div>
+          <div class="field"><label>Territory</label>
+            <select id="pr-territory">
+              <option value="">Select</option>
+              <option>Chennai</option><option>ROTN</option><option>Kerala</option>
+              <option>AP</option><option>TS</option><option>Bangalore</option>
+              <option>ROK</option><option>Odisha</option><option>Others</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Contact person</label><input type="text" id="pr-contact" autocomplete="off"></div>
+        <div class="field"><label>Mobile</label><input type="tel" id="pr-mobile" maxlength="10"></div>
+        <div class="field"><label>Follow-up date</label><input type="date" id="pr-followup"></div>
+        <div class="field"><label>Notes</label><textarea id="pr-notes" placeholder="Products shown, initial reaction, next steps..."></textarea></div>
+        <button class="btn" onclick="submitProspect()">Save Prospect ✓</button>
+      </div>
+
+      <!-- STEP 2: AUDIT -->
+      <div id="vs2" style="display:none">
+        <div class="slabel" style="margin-top:0">Stock audit — <span id="audit-store-name" style="text-transform:none;font-weight:400;font-size:12px;color:var(--t2)"></span></div>
+        <p style="font-size:13px;color:var(--t2);margin-bottom:8px">Enter quantity on shelf for each product.</p>
+        
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-inp" type="text" id="audit-search" placeholder="Search product to add..." autocomplete="off" oninput="filterProds('audit')" onfocus="filterProds('audit')" onblur="setTimeout(()=>hideDrops(),200)">
+          <div class="search-drop" id="audit-prod-drop"></div>
+        </div>
+        <button onclick="openVoiceEntry('audit')" style="width:100%;margin-top:8px;padding:12px;border:1.5px solid var(--g);border-radius:10px;background:var(--gl);color:var(--gd);font-size:13px;font-weight:600;cursor:pointer">🎤 Quick Entry — speak products</button>
+        <div id="audit-prod-entry" style="display:none" class="add-form">
+          <div class="add-form-title" id="audit-entry-title">Enter shelf quantity</div>
+          <div class="field"><label>Qty on shelf <span class="req">*</span></label>
+            <input type="number" min="0" id="audit-entry-qty" class="qty-inp" style="width:100%" placeholder="Enter quantity">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="btn-out" onclick="cancelAuditEntry()">Cancel</button>
+            <button class="btn" onclick="confirmAuditEntry()">Add ✓</button>
+          </div>
+        </div>
+        <div id="audit-list"></div>
+        <div style="margin-top:12px">
+          <div class="tog-wrap" style="background:#fff5f5;border-color:#fde8e8" onclick="toggleUnsaleable()">
+            <div class="tog-txt" style="color:var(--r)">⚠️ Report unsaleable / damaged / expired stock</div>
+            <div class="tog" id="uns-tog"></div>
+          </div>
+          <div id="uns-section" style="display:none">
+            <p style="font-size:13px;color:var(--t2);margin-bottom:10px">Select products with damaged or expired stock.</p>
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input class="search-inp" type="text" id="uns-search" placeholder="Search product..." autocomplete="off" style="border-color:#fde8e8;background:#fff5f5" oninput="filterProds('uns')" onfocus="filterProds('uns')" onblur="setTimeout(()=>hideDrops(),200)">
+              <div class="search-drop" id="uns-prod-drop"></div>
+            </div>
+            <div id="uns-list"></div>
+          </div>
+        </div>
+        <button class="btn" style="margin-top:12px" onclick="goStep3()">Next: Book order →</button>
+        <button class="btn-out" onclick="goStep(1)">← Back</button>
+      </div>
+
+      <!-- STEP 3: ORDER -->
+      <div id="vs3" style="display:none">
+        <div class="slabel" style="margin-top:0">Order — <span id="order-store-name" style="text-transform:none;font-weight:400;font-size:12px;color:var(--t2)"></span></div>
+        <p style="font-size:13px;color:var(--t2);margin-bottom:12px">Select products to replenish.</p>
+
+        <div id="margin-required-block" style="display:none">
+          <div style="padding:14px;background:var(--al);border:1px solid #ffc107;border-radius:var(--rad);margin-bottom:14px">
+            <div style="font-size:13px;font-weight:700;color:var(--a);margin-bottom:6px">⚠️ This store has no margin % set</div>
+            <div style="font-size:12px;color:var(--t2);margin-bottom:10px">A margin is required for correct pricing before you can book an order here.</div>
+            <select id="margin-required-select" style="width:100%;padding:11px;border:1px solid var(--bd);border-radius:var(--rads);margin-bottom:10px;font-size:14px">
+              <option value="">Select margin %</option>
+              <option value="10">10%</option><option value="15">15%</option>
+              <option value="20">20%</option><option value="25">25%</option>
+              <option value="30">30%</option>
+              <option value="special">Special price (per order)</option>
+            </select>
+            <button class="btn" style="margin-bottom:0" onclick="confirmStoreMargin()">Confirm margin &amp; continue</button>
+          </div>
+        </div>
+
+        <div id="vs3-main">
+        <div class="tog-wrap" style="background:#fff5f5;border-color:#fde8e8" onclick="toggleNoOrder()">
+          <div class="tog-txt" style="color:var(--r)">🚫 No order needed at this visit</div>
+          <div class="tog" id="noorder-tog"></div>
+        </div>
+        <div id="noorder-section" style="display:none;margin-bottom:12px">
+          <div class="field"><label>Reason</label>
+            <select id="noorder-reason">
+              <option value="">-- Select reason --</option>
+              <option value="Sufficient stock">Sufficient stock at store</option>
+              <option value="Owner unavailable">Owner/buyer unavailable</option>
+              <option value="Store closed">Store closed</option>
+              <option value="Payment pending">Payment pending / credit hold</option>
+              <option value="Not interested">Not interested this visit</option>
+              <option value="Other">Other (see notes)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="order-normal-section">
+        <div id="quick-reorder-section" style="display:none;margin-bottom:10px">
+          <div style="background:var(--bl);border:1px solid var(--bd);border-radius:var(--rad);padding:10px 13px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--b)">Last order available</div>
+              <div style="font-size:11px;color:var(--t2);margin-top:2px" id="quick-reorder-info"></div>
+            </div>
+            <button class="btn btn-sm" onclick="applyQuickReorder()" style="background:var(--b);font-size:11px;padding:7px 12px;white-space:nowrap">Use last order</button>
+          </div>
+        </div>
+        
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-inp" type="text" id="order-search" placeholder="Search product to add..." autocomplete="off" oninput="filterProds('order')" onfocus="filterProds('order')" onblur="setTimeout(()=>hideDrops(),200)">
+          <div class="search-drop" id="order-prod-drop"></div>
+        </div>
+        <button onclick="openVoiceEntry('order')" style="width:100%;margin-top:8px;padding:12px;border:1.5px solid var(--g);border-radius:10px;background:var(--gl);color:var(--gd);font-size:13px;font-weight:600;cursor:pointer">🎤 Quick Entry — speak products</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+          <label onclick="document.getElementById('po-upload-input').click()" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border:1.5px solid #0A6FA3;border-radius:10px;background:#e8f4fd;color:#0A6FA3;font-size:13px;font-weight:600;cursor:pointer">📄 Upload PO</label>
+          <input type="file" id="po-upload-input" accept=".pdf,image/*" style="display:none" onchange="handlePOUpload(event)">
+        </div>
+        <div id="order-prod-entry" style="display:none" class="add-form">
+          <div class="add-form-title" id="order-entry-title">Enter order quantity</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:8px" id="order-entry-price"></div>
+          <div class="field"><label>Qty (nos) <span class="req">*</span></label>
+            <input type="number" min="1" id="order-entry-qty" class="qty-inp" style="width:100%" placeholder="Enter quantity">
+          </div>
+          <div style="font-size:12px;color:var(--t3);margin-bottom:6px" id="order-entry-cases"></div>
+          <div id="order-entry-sp-wrap">
+            <div class="sp-link" onclick="toggleOrderEntrySP()">💰 Override price (optional)</div>
+            <div id="order-entry-sp-field" style="display:none">
+              <input type="number" class="sp-inp" id="order-entry-sp" placeholder="Enter special price ₹">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+            <button class="btn-out" onclick="cancelOrderEntry()">Cancel</button>
+            <button class="btn" onclick="confirmOrderEntry()">Add ✓</button>
+          </div>
+        </div>
+        <div id="order-list"></div>
+        <div id="order-total" style="display:none" class="tot-box">
+          <div class="tot-row"><span>Taxable value (ex-GST)</span><span id="t-base">₹0</span></div>
+          <div class="tot-row"><span>GST @ 5% (incl. in price)</span><span id="t-gst">₹0</span></div>
+          <div class="tot-row main"><span>Order total</span><span id="t-grand">₹0</span></div>
+        </div>
+        </div>
+        </div>
+        <button class="btn" onclick="goStep4()">Next: Confirm →</button>
+        <button class="btn-out" onclick="goStep(2)">← Back</button>
+      </div>
+
+      <!-- STEP 4: CONFIRM -->
+      <div id="vs4" style="display:none">
+        <div class="slabel" style="margin-top:0">Order summary</div>
+        <div id="summary-card" class="card"></div>
+        <div class="field"><label>Notes / special instructions</label><textarea id="v-submit-notes" placeholder="Delivery timing, special requests..."></textarea></div>
+
+        <div class="alert-banner" id="special-alert">⚠️ Special price used — GM will be notified.</div>
+        <div class="alert-banner" id="uns-alert">⚠️ Unsaleable stock reported — GM will be notified.</div>
+        <button class="btn" id="submit-order-btn" onclick="confirmAndSubmitOrder()">Submit order</button>
+        <button class="btn-out" onclick="goStep(3)">← Back</button>
+      </div>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div id="tab-orders" class="tab">
+      <div id="sync-ts-orders" style="font-size:11px;color:var(--t3);text-align:right;padding:4px 0 2px"></div>
+      <button onclick="openMarketSupplyEntry()" style="width:100%;padding:12px;border:none;border-radius:10px;background:#FF6F00;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px">📦 New Market Supply Entry</button>
+      <div class="search-wrap" style="margin-bottom:8px">
+        <span class="search-icon">🔍</span>
+        <input class="search-inp" type="text" id="orders-search" placeholder="Search by store, officer, distributor..." autocomplete="off" oninput="renderOrders()">
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;align-items:center">
+        <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+          <label style="font-size:10px;color:var(--t3);padding-left:2px">From</label>
+          <input type="date" id="orders-date-from" onchange="renderOrders()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--rads);font-size:13px;background:var(--w)">
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+          <label style="font-size:10px;color:var(--t3);padding-left:2px">To</label>
+          <input type="date" id="orders-date-to" onchange="renderOrders()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--rads);font-size:13px;background:var(--w)">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <label style="font-size:10px;color:transparent">x</label>
+          <button class="btn-out btn-sm" onclick="document.getElementById('orders-search').value='';document.getElementById('orders-date-from').value='';document.getElementById('orders-date-to').value='';renderOrders()" style="padding:8px 12px;font-size:12px;white-space:nowrap">Clear</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button id="ord-filter-all" class="btn-out btn-sm" onclick="setOrderSupplyFilter('all')" style="font-size:12px;font-weight:700;background:var(--g);color:#fff;border-color:var(--g)">All</button>
+        <button id="ord-filter-pending" class="btn-out btn-sm" onclick="setOrderSupplyFilter('pending')" style="font-size:12px">Pending</button>
+        <button id="ord-filter-supplied" class="btn-out btn-sm" onclick="setOrderSupplyFilter('supplied')" style="font-size:12px">Supplied ✓</button>
+      </div>
+      <div id="orders-list"></div>
+      <div id="orders-load-more" style="display:none;text-align:center;padding:10px">
+        <button class="btn-out btn-sm" id="orders-show-all" data-show="false" onclick="this.dataset.show='true';this.closest('div').style.display='none';renderOrders()" style="font-size:12px">Load all orders</button>
+      </div>
+    </div>
+
+    <!-- DAY TAB -->
+    <div id="tab-day" class="tab">
+      <div class="day-banner idle" id="day-banner2" style="margin-bottom:14px">
+        <div>
+          <div style="font-size:13px;font-weight:600" id="day2-txt">Day not started</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:2px" id="day2-sub"></div>
+        </div>
+        <div style="font-size:24px" id="day2-icon">⬜</div>
+      </div>
+
+      <div id="start-day-card" class="card">
+        <div class="card-title">🌅 Start my day</div>
+        <div class="card-sub" style="margin-bottom:12px">Enter your route plan. Your location will be recorded.</div>
+        <div class="field"><label>Travel type for today <span class="req">*</span></label>
+          <select id="day-travel-type">
+            <option value="">-- Select travel type --</option>
+            <option value="local">Local</option>
+            <option value="exmarket">Ex-market</option>
+            <option value="exmarket_night">Ex-market with night stay</option>
+          </select>
+        </div>
+        <!-- ASM/RSM accompaniment — shown/hidden by JS on launch -->
+        <div class="field" id="accompany-field" style="display:none">
+          <label>Accompanying an officer today?</label>
+          <select id="accompany-toggle" onchange="toggleAccompanyOfficer(this.value)">
+            <option value="no">No — working independently</option>
+            <option value="yes">Yes — accompanying an officer</option>
+          </select>
+        </div>
+        <div class="field" id="accompany-officer-field" style="display:none">
+          <label>Select officer</label>
+          <select id="accompany-officer-select">
+            <option value="">-- Select officer --</option>
+          </select>
+        </div>
+        <div class="field"><label>Today's route plan <span class="req">*</span></label><textarea id="route-plan" placeholder="e.g. Anna Nagar → Kilpauk → T.Nagar → Kodambakkam"></textarea></div>
+        <div class="field"><label>Target stores (optional)</label><input type="text" id="target-stores" placeholder="e.g. 8 stores" autocomplete="off"></div>
+        <button class="btn" onclick="startDay()">Start day →</button>
+      </div>
+
+      <div id="end-day-card" class="card" style="display:none">
+        <div class="card-title">🌆 End my day</div>
+        <div id="day-summary-content" style="margin-bottom:12px"></div>
+        <div id="end-day-expenses" style="display:none">
+          <div class="slabel" style="margin-top:0">Additional expenses</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Enter any additional expenses for today.</div>
+          <div id="end-day-exp-rows"></div>
+          <button class="btn-out btn-sm" onclick="addEndDayExpRow()" style="margin-bottom:10px;width:100%">+ Add expense</button>
+        </div>
+        <div class="field"><label>Remarks</label><textarea id="day-remarks" placeholder="Challenges, follow-ups, special notes..."></textarea></div>
+        <button class="btn" onclick="endDay()">End my day</button>
+      </div>
+
+<!-- Expense entry moved to end of day flow -->
+
+      <!-- EXPENSE HISTORY -->
+      <div class="slabel">Expense history</div>
+
+      <!-- Month selector and download -->
+      <div style="background:var(--w);border:1px solid var(--bd);border-radius:var(--rad);padding:12px 13px;margin-bottom:12px">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+          <div class="field" style="margin:0;flex:1">
+            <label style="font-size:11px;color:var(--t2);margin-bottom:4px;display:block">Select month</label>
+            <select id="exp-month-select" onchange="renderExpHistory()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--rads);font-size:13px;background:var(--w)">
+            </select>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:8px">Monthly report includes all submitted expenses for the selected month.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-sm" onclick="downloadExpReportPDF()" style="padding:10px;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px">📄 Monthly PDF</button>
+          <button class="btn btn-sm btn-amber" onclick="downloadExpReportExcel()" style="padding:10px;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px">📊 Monthly Excel</button>
+        </div>
+      </div>
+
+      <!-- Hidden IDs needed by JS expense functions (form is shown in End Day modal) -->
+      <div style="display:none">
+        <select id="exp-type"></select>
+        <div id="exp-base-fare-row"></div>
+        <div id="exp-base-display"></div>
+        <div id="exp-extra-section"></div>
+        <div id="exp-rows"></div>
+        <div id="exp-total-row"></div>
+        <span id="exp-t-base"></span>
+        <span id="exp-t-extra"></span>
+        <span id="exp-t-total"></span>
+        <input id="exp-notes" type="text">
+        <button id="exp-submit-btn"></button>
+        <div id="expense-section"></div>
+      </div>
+
+      <div id="exp-history"></div>
+
+      <div id="leave-section" class="card" style="margin-top:10px">
+        <div class="card-title">🏖️ Mark leave</div>
+        <div class="card-sub" style="margin-bottom:12px">Your manager will be notified via WhatsApp.</div>
+        <div class="field"><label>Leave type</label>
+          <select id="leave-type">
+            <option value="">-- Select type --</option>
+            <option>Leave</option>
+            <option>Half day</option>
+          </select>
+        </div>
+        <div class="field"><label>Reason (optional)</label><input type="text" id="leave-reason" placeholder="Brief reason" autocomplete="off"></div>
+        <button class="btn btn-red" onclick="markLeave()">Notify manager and mark leave</button>
+      </div>
+
+      <div class="slabel">This week</div>
+      <div id="att-history"></div>
+    </div>
+
+    <!-- FILES TAB -->
+    <div id="tab-files" class="tab">
+
+      <!-- ══ VIDEOS ══ -->
+      <div class="files-section-hdr">
+        <span>🎬 Diabliss Videos</span>
+        <button id="videos-edit-btn" onclick="toggleVideoEditor()" style="display:none;background:none;border:1px solid var(--bd);border-radius:var(--rads);font-size:11px;color:var(--t2);cursor:pointer;padding:4px 10px">✏️ Edit</button>
+      </div>
+      <div id="video-editor-panel" style="display:none;background:var(--w);border:1.5px solid var(--g);border-radius:var(--rad);padding:14px;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--g);margin-bottom:12px">Add / Edit Video</div>
+        <div class="field"><label>YouTube URL or Video ID</label><input type="text" id="ve-url" placeholder="e.g. https://youtu.be/kBVZShio7Tg" autocomplete="off"></div>
+        <div class="field"><label>Title</label><input type="text" id="ve-title" placeholder="e.g. Diabliss Sugar — How it works" autocomplete="off"></div>
+        <div class="field"><label>Category</label>
+          <select id="ve-cat">
+            <option value="Product Features">Product Features</option>
+            <option value="Testimonials">Testimonials</option>
+            <option value="Recipes">Recipes</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn-out btn-sm" style="width:100%" onclick="saveVideoEntry()">➕ Add video</button>
+          <button class="btn-out btn-sm" style="width:100%;border-color:var(--bd);color:var(--t2)" onclick="toggleVideoEditor()">Cancel</button>
+        </div>
+      </div>
+      <div id="videos-section"></div>
+
+      <!-- ══ PRODUCT PHOTOS ══ -->
+      <div class="files-section-hdr" style="margin-top:20px">
+        <span>📸 Product Photos</span>
+        <button onclick="(function(el){const b=document.getElementById('ph-body');const open=b.style.display!=='none';b.style.display=open?'none':'block';el.textContent=open?'Show ▸':'Hide ▾'})(this)" style="background:none;border:1px solid var(--bd);border-radius:var(--rads);font-size:11px;color:var(--t2);cursor:pointer;padding:4px 10px">Show ▸</button>
+      </div>
+      <div style="font-size:12px;color:#7a4f00;background:#fff8e1;border:1px solid #ffe082;border-radius:var(--rads);padding:8px 10px;margin-bottom:12px">⚠️ For internal and authorised trade use only. Please share responsibly.</div>
+      <div id="ph-body" style="display:none">
+        <div id="product-photos-list"></div>
+      </div>
+
+      <!-- ══ DOCUMENTS ══ -->
+      <div class="files-section-hdr" style="margin-top:20px">
+        <span>📄 Documents</span>
+        <button onclick="(function(el){const b=document.getElementById('docs-body');const open=b.style.display!=='none';b.style.display=open?'none':'block';el.textContent=open?'Show ▸':'Hide ▾'})(this)" style="background:none;border:1px solid var(--bd);border-radius:var(--rads);font-size:11px;color:var(--t2);cursor:pointer;padding:4px 10px">Show ▸</button>
+      </div>
+      <div style="font-size:12px;color:#7a4f00;background:#fff8e1;border:1px solid #ffe082;border-radius:var(--rads);padding:8px 10px;margin-bottom:8px">⚠️ For internal and authorised trade use only. Please share responsibly.</div>
+      <div id="docs-body" style="display:none">
+        <div id="company-files-list"></div>
+      </div>
+
+      <!-- ══ REFERENCE ══ -->
+      <div class="files-section-hdr" style="margin-top:20px"><span>🔖 Reference</span></div>
+      <div style="background:var(--w);border:1px solid var(--bd);border-radius:var(--rad);margin-bottom:10px;overflow:hidden">
+        <div onclick="toggleHSNTable()" style="padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:13px;font-weight:600">Product HSN &amp; EAN reference</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button class="btn-out btn-sm" onclick="event.stopPropagation();window.open('hsn-ean.html','_blank')" style="font-size:11px">Full details ↗</button>
+            <span id="hsn-toggle-icon" style="font-size:16px">▸</span>
+          </div>
+        </div>
+        <div id="hsn-table-wrap" style="display:none">
+          <div style="padding:8px 14px;display:flex;gap:8px;border-top:1px solid var(--bd)">
+            <button class="btn-out btn-sm" onclick="copyHSNTable()" style="font-size:11px">Copy all</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table id="hsn-table" style="width:100%;border-collapse:collapse;font-size:11px">
+              <thead><tr style="background:var(--bg)">
+                <th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--bd);font-weight:700">#</th>
+                <th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--bd);font-weight:700">Product</th>
+                <th style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--bd);font-weight:700">MRP</th>
+                <th style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--bd);font-weight:700">HSN</th>
+                <th style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--bd);font-weight:700">EAN</th>
+              </tr></thead>
+              <tbody id="hsn-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ COMPANY INFO ══ -->
+      <div class="files-section-hdr" style="margin-top:20px"><span>🏢 Company Info</span></div>
+      <div style="background:var(--w);border:1px solid var(--bd);border-radius:var(--rad);margin-bottom:10px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.ci-chev').textContent=this.nextElementSibling.style.display==='none'?'▸':'▾'" style="padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:13px;font-weight:600">Diabliss Consumer Products Pvt Ltd</div>
+          <span class="ci-chev" style="font-size:14px;color:var(--t3)">▸</span>
+        </div>
+        <div style="display:none;padding:0 14px 14px;border-top:1px solid var(--bd)">
+          <div style="font-size:11px;font-weight:700;color:var(--t3);margin:12px 0 4px">REGISTERED OFFICE</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:6px">Type II, Unit 20, Dr.VSI Estate, Thiruvanmiyur, Chennai – 600041<br>GSTN: 33AADCE2529E1Z4<br>📞 044-48530303 &nbsp;|&nbsp; 📱 +91 89398 53354</div>
+          <div style="display:flex;gap:6px;margin-bottom:10px">
+            <button class="btn-out btn-sm" onclick="window.open('https://maps.app.goo.gl/nS5FYHtHZ9JhqpG4A')" style="font-size:11px">📍 Maps</button>
+            <button class="btn-out btn-sm" onclick="(function(){const t='Diabliss Consumer Products Pvt Ltd%0AType II, Unit 20, Dr.VSI Estate, Thiruvanmiyur, Chennai – 600041%0AGSTN: 33AADCE2529E1Z4%0ATel: 044-48530303 | Mob: +91 89398 53354%0Ahttps://maps.app.goo.gl/nS5FYHtHZ9JhqpG4A';window.open('https://wa.me/?text='+t,'_blank')})()" style="font-size:11px">📤 Share</button>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--t3);margin:4px 0 4px">FACTORY</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:6px">74/5, Abhishegapakkam Main Road, Thavalakuppam, Puducherry – 605007<br>GSTN: 34AADCE2529E1Z2<br>📱 +91 96000 74048</div>
+          <div style="display:flex;gap:6px;margin-bottom:10px">
+            <button class="btn-out btn-sm" onclick="window.open('https://maps.app.goo.gl/sqL15j6RdTrWi1ay6')" style="font-size:11px">📍 Maps</button>
+            <button class="btn-out btn-sm" onclick="(function(){const t='Diabliss Consumer Products Pvt Ltd%0A74/5, Abhishegapakkam Main Road, Thavalakuppam, Puducherry – 605007%0AGSTN: 34AADCE2529E1Z2%0AMob: +91 96000 74048%0Ahttps://maps.app.goo.gl/sqL15j6RdTrWi1ay6';window.open('https://wa.me/?text='+t,'_blank')})()" style="font-size:11px">📤 Share</button>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--t3);margin:4px 0 6px">BANK ACCOUNT</div>
+          <div style="font-size:12px;color:var(--t2);line-height:2;margin-bottom:6px">
+            <div><span style="color:var(--t3)">Bank</span> &nbsp; State Bank of India</div>
+            <div><span style="color:var(--t3)">A/c Name</span> &nbsp; Diabliss Consumer Products Pvt Ltd</div>
+            <div><span style="color:var(--t3)">A/c No</span> &nbsp; <span style="font-family:monospace;font-size:13px;font-weight:600;color:var(--t);cursor:pointer" onclick="copyText('34356181364')">34356181364</span></div>
+            <div><span style="color:var(--t3)">IFSC</span> &nbsp; <span style="font-family:monospace;font-size:13px;font-weight:600;color:var(--t);cursor:pointer" onclick="copyText('SBIN0004327')">SBIN0004327</span></div>
+            <div><span style="color:var(--t3)">Branch</span> &nbsp; SME Commercial Branch, Guindy</div>
+          </div>
+          <button class="btn-out btn-sm" onclick="shareBankDetails()" style="font-size:11px;margin-bottom:10px">📤 Share bank details</button>
+        </div>
+      </div>
+
+      <!-- ══ CONTACTS ══ -->
+      <div class="files-section-hdr" style="margin-top:4px"><span>📞 Contacts</span></div>
+      <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--w);border:1px solid var(--bd);border-radius:var(--rad)">
+          <div><div style="font-size:13px;font-weight:600">Dispatch</div><div style="font-size:11px;color:var(--t3)">+91 96000 74048</div></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn-out btn-sm" onclick="window.open('tel:+919600074048')" style="font-size:13px;padding:6px 10px">📞</button>
+            <button class="btn-out btn-sm" onclick="window.open('https://wa.me/919600074048')" style="font-size:13px;padding:6px 10px">💬</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--w);border:1px solid var(--bd);border-radius:var(--rad)">
+          <div><div style="font-size:13px;font-weight:600">HR</div><div style="font-size:11px;color:var(--t3)">+91 89398 53354</div></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn-out btn-sm" onclick="window.open('tel:+918939853354')" style="font-size:13px;padding:6px 10px">📞</button>
+            <button class="btn-out btn-sm" onclick="window.open('https://wa.me/918939853354')" style="font-size:13px;padding:6px 10px">💬</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--w);border:1px solid var(--bd);border-radius:var(--rad)">
+          <div><div style="font-size:13px;font-weight:600">Accounts</div><div style="font-size:11px;color:var(--t3)">+91 99404 99775</div></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn-out btn-sm" onclick="window.open('tel:+919940499775')" style="font-size:13px;padding:6px 10px">📞</button>
+            <button class="btn-out btn-sm" onclick="window.open('https://wa.me/919940499775')" style="font-size:13px;padding:6px 10px">💬</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ QUICK LINKS — managers only, rendered by JS ══ -->
+      <div id="quick-links-section"></div>
+
+    </div>
+
+    <!-- INVOICE TAB -->
+    <div id="tab-invoice" class="tab">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0 2px">
+        <div id="sync-ts-invoice" style="font-size:11px;color:var(--t3)"></div>
+        <button onclick="if(typeof fetchAndCacheDists==='function'){fetchAndCacheDists().then(()=>{if(typeof initInvLedger==='function')initInvLedger();toast('Synced ✅')}).catch(()=>toast('Sync failed'))}" style="background:none;border:1px solid var(--bd);border-radius:var(--rads);font-size:11px;color:var(--g);padding:3px 10px;cursor:pointer">🔄 Sync now</button>
+      </div>
+      <div class="slabel" style="margin-top:0">Bill to</div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-inp" type="text" id="inv-bill-search" placeholder="Search distributor..." autocomplete="off" oninput="filterInvDist('bill')" onfocus="filterInvDist('bill')" onblur="setTimeout(()=>hideDrops(),200)">
+        <div class="search-drop" id="inv-bill-drop"></div>
+      </div>
+      <div id="inv-bill-selected" style="display:none"></div>
+      <button class="btn-out btn-sm" onclick="toggleForm('inv-add-dist-form')" style="margin-bottom:12px">+ Add new distributor</button>
+      <div id="inv-add-dist-form" style="display:none" class="add-form">
+        <div class="add-form-title">Add distributor</div>
+        <div class="field"><label>Name <span class="req">*</span></label><input type="text" id="iad-name" autocomplete="off"></div>
+        <div class="field"><label>Type</label><select id="iad-type" onchange="toggleDistPattern(this.value)"><option value="Distributor">Distributor</option><option value="Super Stockist">Super Stockist</option></select></div>
+        <div class="field"><label>Billing pattern <span class="req">*</span></label>
+          <select id="iad-pattern">
+            <option value="">-- Select pattern --</option>
+            <option value="TN_KA|25|13|7">TN and KA — 25-13-7</option>
+            <option value="AP_TS|20|10|10">AP and TS — 20-10-10</option>
+            <option value="KL_A|25|13|8">KL — 25-13-8</option>
+            <option value="KL_B|25|13|5">KL — 25-13-5</option>
+            <option value="KL_C|32|13|7">KL — 32-13-7</option>
+            <option value="KL_D|25|13|7">KL — 25-13-7</option>
+            <option value="KL_E|25|13|10">KL — 25-13-10</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Territory <span class="req">*</span></label>
+            <select id="iad-territory">
+              <option value="">Select</option>
+              <option>Chennai</option><option>ROTN</option><option>Kerala</option>
+              <option>AP</option><option>TS</option><option>Bangalore</option>
+              <option>ROK</option><option>Odisha</option><option>Others</option>
+            </select>
+          </div>
+          <div class="field"><label>City</label><input type="text" id="iad-city" autocomplete="off"></div>
+        </div>
+        <div class="field"><label>Pincode <span style="font-size:11px;color:var(--t3)">(optional)</span></label><input type="text" id="iad-pincode" inputmode="numeric" maxlength="6" placeholder="6-digit pincode" autocomplete="off"></div>
+        <div class="field"><label>Contact</label><input type="text" id="iad-contact" autocomplete="off"></div>
+        <div class="field"><label>Mobile</label><input type="tel" id="iad-mobile"></div>
+        <div class="field"><label>GSTIN <span class="req">*</span></label><input type="text" id="iad-gstin" placeholder="e.g. 33AABCD1234E1Z5 or URP" autocomplete="off" maxlength="15" style="text-transform:uppercase"></div>
+        <div class="field"><label>Address</label><input type="text" id="iad-addr" autocomplete="off"></div>
+        <button class="btn" onclick="saveInvDist()">Save distributor</button>
+      </div>
+
+      <div class="slabel">Ship to <span style="font-size:11px;color:var(--t3);font-weight:400;text-transform:none">(optional)</span></div>
+      <div id="ship-to-toggle" style="margin-bottom:10px">
+        <button class="btn-out btn-sm" onclick="showShipTo()">+ Add ship to address (if different)</button>
+      </div>
+      <div id="ship-to-section" style="display:none">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-inp" type="text" id="inv-ship-search" placeholder="Search distributor..." autocomplete="off" oninput="filterInvDist('ship')" onfocus="filterInvDist('ship')" onblur="setTimeout(()=>hideDrops(),200)">
+          <div class="search-drop" id="inv-ship-drop"></div>
+        </div>
+        <div id="inv-ship-selected" style="display:none"></div>
+        <button class="btn-out btn-sm" onclick="hideShipTo()" style="margin-bottom:10px;color:var(--r);border-color:var(--r)">✕ Remove ship to</button>
+      </div>
+
+      <div class="slabel">Products</div>
+      <div id="inv-prod-picker">
+        
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-inp" type="text" id="inv-prod-search" placeholder="Search product to add..." autocomplete="off" oninput="filterProds('inv')" onfocus="filterProds('inv')" onblur="setTimeout(()=>hideDrops(),200)">
+          <div class="search-drop" id="inv-prod-drop"></div>
+        </div>
+        <div id="inv-prod-entry" style="display:none" class="add-form">
+          <div class="add-form-title" id="inv-entry-title">Enter quantity</div>
+          <div class="field"><label>Qty (nos) <span class="req">*</span></label>
+            <input type="number" min="1" id="inv-entry-qty" class="qty-inp" style="width:100%" placeholder="Enter quantity">
+          </div>
+          <div style="font-size:12px;color:var(--t3);margin-bottom:10px" id="inv-entry-cases"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="btn-out" onclick="cancelInvEntry()">Cancel</button>
+            <button class="btn" onclick="confirmInvEntry()">Add product ✓</button>
+          </div>
+        </div>
+      </div>
+      <div id="inv-prod-list"></div>
+      <div id="inv-total" class="tot-box" style="display:none">
+        <div class="tot-row"><span>Basic value (ex-GST)</span><span id="inv-t-base">₹0</span></div>
+        <div class="tot-row"><span>GST @ 5%</span><span id="inv-t-gst">₹0</span></div>
+        <div class="tot-row main"><span>Total invoice amount</span><span id="inv-t-grand">₹0</span></div>
+      </div>
+
+      <div class="field" style="margin-top:8px"><label>Remarks / special requests</label>
+        <textarea id="inv-remarks" placeholder="e.g. Kindly send 10 catalogues, 5 scheme posters along with this order..." style="border-color:#EF9F27;background:#FFFDF7"></textarea>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn" onclick="generateInvoice()">Generate invoice</button>
+        <button class="btn btn-amber" onclick="shareInvoice()">Share</button>
+        <button class="btn btn-out" onclick="shareInvoiceAsPdf()">📄 PDF</button>
+      </div>
+
+      <div id="inv-preview" style="display:none;margin-top:14px"></div>
+
+      <div class="slabel">Order / Invoice history</div>
+      <div id="invoice-history-list"></div>
+
+      <!-- LEDGER SECTION -->
+      <div class="slabel" style="margin-top:14px">Distributor / SS ledger</div>
+      <div style="font-size:12px;color:var(--t2);background:var(--gl);border-radius:var(--rads);padding:9px 12px;margin-bottom:10px">View running balance and transaction history. Sub-Admin and Admin can add entries.</div>
+      <div class="field">
+        <label>Select party</label>
+        <input type="search" id="ledger-party-search" placeholder="Search distributor..." oninput="filterLedgerParty()" style="width:100%;padding:9px 10px;border:1.5px solid var(--bd);border-radius:var(--rads);font-size:14px;margin-bottom:6px;box-sizing:border-box">
+        <select id="inv-ledger-party" onchange="this.size=1;this.style.height='';var s=document.getElementById('ledger-party-search');if(s)s.value='';loadInvLedger()">
+          <option value="">-- Select distributor or SS --</option>
+        </select>
+      </div>
+      <div id="inv-ledger-balance" style="display:none;margin-bottom:10px"></div>
+      <div id="inv-ledger-entry" style="display:none" class="add-form">
+        <div class="add-form-title">Add ledger entry</div>
+        <div class="field-row">
+          <div class="field"><label>Date <span class="req">*</span></label><input type="date" id="invl-date"></div>
+          <div class="field"><label>Type <span class="req">*</span></label>
+            <select id="invl-type">
+              <option value="debit">Debit (amount due)</option>
+              <option value="credit">Credit (payment received)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Amount (₹) <span class="req">*</span></label><input type="number" id="invl-amount" placeholder="Enter amount" min="0"></div>
+        <div class="field"><label>Particulars <span class="req">*</span></label><input type="text" id="invl-particulars" placeholder="e.g. Sales Invoice No. PY/245/26-27 dt. 29th June 2026" autocomplete="off"></div>
+        <button id="inv-ob-btn" class="btn-out btn-sm" onclick="setInvOpeningBalance()" style="margin-bottom:8px;width:100%">💰 Set opening balance</button>
+        <button class="btn" onclick="saveInvLedgerEntry()">Save entry</button>
+      </div>
+      <div id="inv-ledger-list"></div>
+      <div id="inv-ledger-actions" style="display:none;margin-top:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-sm" onclick="generateInvLedgerStatement()">📄 PDF statement</button>
+          <button class="btn btn-sm btn-amber" onclick="shareInvLedgerStatement()">Share</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD TAB (ASM/RSM/GM) -->
+    <div id="tab-dashboard" class="tab">
+      <div id="admin-glance"></div>
+      <div class="stat-grid">
+        <div class="stat" onclick="showDrillDown('orders')" style="cursor:pointer"><div class="stat-n" id="d-orders">0</div><div class="stat-l">Orders ›</div></div>
+        <div class="stat" onclick="showDrillDown('stores')" style="cursor:pointer"><div class="stat-n" id="d-stores">0</div><div class="stat-l">Stores ›</div></div>
+        <div class="stat" onclick="showDrillDown('value')" style="cursor:pointer"><div class="stat-n" id="d-value">₹0</div><div class="stat-l">Value ›</div></div>
+      </div>
+      <div class="dash-filter">
+        <div class="df on" onclick="setDashFilter('day',this)">Today</div>
+        <div class="df" onclick="setDashFilter('week',this)">This week</div>
+        <div class="df" onclick="setDashFilter('month',this)">This month</div>
+      </div>
+      <div id="d-growth" style="display:none;font-size:11px;font-weight:600;text-align:center;padding:4px 0;margin-bottom:4px"></div>
+      <div class="chart-wrap">
+        <div class="chart-title">Daily orders</div>
+        <div class="bars" id="dash-bars"></div>
+        <div style="display:flex;gap:4px" id="dash-bar-lbls"></div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Value trend</div>
+        <canvas id="line-chart" height="70"></canvas>
+      </div>
+      <div class="slabel">Team performance</div>
+      <div id="team-list"></div>
+      <div id="inactive-stores-wrap"><div class="slabel">Inactive stores</div><div id="inactive-stores"></div></div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div id="tab-chatbot" class="tab"></div>
+    <div id="tab-settings" class="tab">
+      <div class="slabel" style="margin-top:0">Account</div>
+      <div class="card" style="margin-bottom:10px">
+        <div class="card-title" id="profile-name-card" style="margin-bottom:8px">👤 My Profile</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.8">
+          Mobile: <span id="settings-mobile"></span><br>
+          Role: <span id="settings-role"></span><br>
+          Territory: <span id="settings-territory"></span>
+        </div>
+      </div>
+
+      <div class="slabel">Change PIN</div>
+      <div class="card" style="margin-bottom:10px">
+        <div class="field"><label>Current PIN</label>
+          <input type="password" id="pin-current" maxlength="4" inputmode="numeric" placeholder="Enter current PIN" class="pin-inp" style="font-size:22px;letter-spacing:8px;padding:10px" autocomplete="new-password" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)" onkeypress="return event.charCode>=48&&event.charCode<=57">
+        </div>
+        <div class="field"><label>New PIN</label>
+          <input type="password" id="pin-new" maxlength="4" inputmode="numeric" placeholder="Enter new PIN" class="pin-inp" style="font-size:22px;letter-spacing:8px;padding:10px" autocomplete="new-password" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)" onkeypress="return event.charCode>=48&&event.charCode<=57">
+        </div>
+        <div class="field"><label>Confirm new PIN</label>
+          <input type="password" id="pin-confirm" maxlength="4" inputmode="numeric" placeholder="Repeat new PIN" class="pin-inp" style="font-size:22px;letter-spacing:8px;padding:10px" autocomplete="new-password">
+        </div>
+        <button class="btn" onclick="changePIN()">Change PIN</button>
+      </div>
+
+      <div class="slabel">Session</div>
+      <div class="card">
+        <div class="card-sub" style="margin-bottom:12px">Logging out will require you to enter your PIN again on next open.</div>
+        <button class="btn btn-red" onclick="logoutUser()">Log out</button>
+      </div>
+
+      <div class="slabel">App info</div>
+      <div class="card">
+        <div style="font-size:13px;color:var(--t2);line-height:1.8">
+          Version: <span id="settings-version"></span><br>
+          Diabliss Consumer Products Pvt Ltd
+        </div>
+      </div>
+    </div>
+
+    <!-- MASTER TAB -->
+    <div id="tab-master" class="tab">
+      <div class="mtabs">
+        <div class="mtab on" onclick="switchMaster(this,'m-stores')">Stores</div>
+        <div class="mtab" onclick="switchMaster(this,'m-prods')">Products</div>
+        <div class="mtab" onclick="switchMaster(this,'m-dists')">Distributors</div>
+        <div class="mtab" onclick="switchMaster(this,'m-insts')">Institutions</div>
+
+      </div>
+      <div id="m-stores">
+        <button class="btn-out" onclick="toggleForm('mstore-form')">+ Add store</button>
+        <div id="mstore-form" style="display:none" class="add-form">
+          <div class="add-form-title">Add store</div>
+          <div class="field"><label>Store name <span class="req">*</span></label><input type="text" id="ms-name" autocomplete="off"></div>
+          <div class="field"><label>Address</label><input type="text" id="ms-addr" autocomplete="off"></div>
+          <div class="field-row">
+            <div class="field"><label>City <span class="req">*</span></label><input type="text" id="ms-city" autocomplete="off"></div>
+            <div class="field"><label>Territory <span class="req">*</span></label>
+              <select id="ms-territory" onchange="populateDistSelect('ms-distributor', this.value)">
+                <option value="">Select</option>
+                <option>Chennai</option><option>ROTN</option><option>Kerala</option>
+                <option>AP</option><option>TS</option><option>Bangalore</option>
+                <option>ROK</option><option>Odisha</option><option>Others</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label>Pincode <span style="font-size:11px;color:var(--t3)">(optional)</span></label><input type="text" id="ms-pincode" inputmode="numeric" maxlength="6" placeholder="6-digit pincode" autocomplete="off"></div>
+          <div class="field"><label>Contact</label><input type="text" id="ms-contact" autocomplete="off"></div>
+          <div class="field-row">
+            <div class="field"><label>Phone</label><input type="tel" id="ms-phone"></div>
+            <div class="field"><label>Mobile</label><input type="tel" id="ms-mobile"></div>
+          </div>
+          <div class="field"><label>Email</label><input type="email" id="ms-email" autocomplete="off"></div>
+          <div class="field"><label>GSTIN <span style="font-size:11px;color:var(--t3)">(optional)</span></label><input type="text" id="ms-gstin" placeholder="e.g. 33AABCD1234E1Z5 or URP" autocomplete="off" maxlength="15" style="text-transform:uppercase"></div>
+          <div class="field"><label>Margin %</label>
+            <select id="ms-margin">
+              <option value="">Select</option>
+              <option value="10">10%</option><option value="15">15%</option>
+              <option value="20">20%</option><option value="25">25%</option>
+              <option value="30">30%</option>
+              <option value="special">Special price (per order)</option>
+            </select>
+          </div>
+          <div class="field"><label>Distributor / SS <span class="req">*</span></label>
+            <select id="ms-distributor"><option value="">Select distributor</option></select>
+          </div>
+          <button class="btn" onclick="saveMStore()">Save store</button>
+        </div>
+        <!-- Search bar lives here permanently — never re-rendered -->
+        <div style="display:flex;gap:8px;margin:8px 0">
+          <input id="ms-search" type="text" placeholder="Search stores…" 
+            oninput="filterMasterStores(this.value)"
+            style="flex:1;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;font-size:13px">
+          <span id="ms-count" style="font-size:12px;color:var(--t3);align-self:center"></span>
+        </div>
+        <div id="ms-list"></div>
+      </div>
+      <div id="m-prods" style="display:none">
+        <button class="btn-out" onclick="toggleForm('mprod-form')">+ Add product</button>
+        <div id="mprod-form" style="display:none" class="add-form">
+          <div class="add-form-title">Add product</div>
+          <div class="field"><label>Product name <span class="req">*</span></label><input type="text" id="mp-name" autocomplete="off"></div>
+          <div class="field-row">
+            <div class="field"><label>Pack size <span class="req">*</span></label><input type="text" id="mp-unit" placeholder="e.g. 500g" autocomplete="off"></div>
+            <div class="field"><label>MRP ₹ <span class="req">*</span></label><input type="number" id="mp-mrp"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Units per case</label><input type="number" id="mp-case"></div>
+            <div class="field"><label>Category</label>
+              <select id="mp-cat">
+                <option>Sugar</option><option>Jaggery</option><option>Tea</option>
+                <option>Cookies</option><option>Jam</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn" onclick="saveMProd()">Save product</button>
+        </div>
+        <div id="mp-list"></div>
+      </div>
+      <div id="m-dists" style="display:none">
+        <button class="btn-out" onclick="toggleForm('mdist-form')">+ Add distributor</button>
+        <div id="mdist-form" style="display:none" class="add-form">
+          <div class="add-form-title">Add distributor</div>
+          <div class="field"><label>Name <span class="req">*</span></label><input type="text" id="md-name" autocomplete="off"></div>
+          <div class="field"><label>Type</label>
+            <select id="md-type"><option value="Distributor">Distributor</option><option value="Super Stockist">Super Stockist</option></select>
+          </div>
+          <div class="field"><label>Billing pattern <span class="req">*</span></label>
+            <select id="md-pattern">
+              <option value="">-- Select pattern --</option>
+              <option value="TN_KA|25|13|7">TN and KA — 25-13-7</option>
+              <option value="AP_TS|20|10|10">AP and TS — 20-10-10</option>
+              <option value="KL_A|25|13|8">KL — 25-13-8</option>
+              <option value="KL_B|25|13|5">KL — 25-13-5</option>
+              <option value="KL_C|32|13|7">KL — 32-13-7</option>
+              <option value="KL_D|25|13|7">KL — 25-13-7</option>
+              <option value="KL_E|25|13|10">KL — 25-13-10</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Territory <span class="req">*</span></label>
+              <select id="md-territory">
+                <option value="">Select</option>
+                <option>Chennai</option><option>ROTN</option><option>Kerala</option>
+                <option>AP</option><option>TS</option><option>Bangalore</option>
+                <option>ROK</option><option>Odisha</option><option>Others</option>
+              </select>
+            </div>
+            <div class="field"><label>City</label><input type="text" id="md-city" autocomplete="off"></div>
+          </div>
+          <div class="field"><label>Pincode <span style="font-size:11px;color:var(--t3)">(optional)</span></label><input type="text" id="md-pincode" inputmode="numeric" maxlength="6" placeholder="6-digit pincode" autocomplete="off"></div>
+          <div class="field"><label>Contact</label><input type="text" id="md-contact" autocomplete="off"></div>
+          <div class="field"><label>Mobile</label><input type="tel" id="md-mobile"></div>
+          <div class="field"><label>GSTIN <span class="req">*</span></label><input type="text" id="md-gstin" placeholder="e.g. 33AABCD1234E1Z5 or URP" autocomplete="off" maxlength="15" style="text-transform:uppercase"></div>
+          <div class="field"><label>Address</label><input type="text" id="md-addr" autocomplete="off"></div>
+          <button class="btn" onclick="saveMDist()">Save distributor</button>
+        </div>
+        <div id="md-list"></div>
+      </div>
+      <div id="m-insts" style="display:none">
+        <div id="mi-list"></div>
+      </div>
+      
+    </div>
+
+    <!-- ADMIN TAB -->
+    <div id="tab-admin" class="tab">
+      <div class="slabel" style="margin-top:0">Admin panel</div>
+      <div class="admin-card" onclick="switchTab('admin-employees')">
+        <div class="admin-icon" style="background:#E8E4FD">👥</div>
+        <div><div class="admin-title">Employee management</div><div class="admin-sub">Add, block, change roles, set alert contacts</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('admin-targets')">
+        <div class="admin-icon" style="background:var(--gl)">🎯</div>
+        <div><div class="admin-title">Target setting</div><div class="admin-sub">Set monthly targets for all officers and managers</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('admin-expenses-config')">
+        <div class="admin-icon" style="background:var(--al)">💰</div>
+        <div><div class="admin-title">Expense configuration</div><div class="admin-sub">Set base fares, mandatory fields, active target types</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('admin-broadcast')">
+        <div class="admin-icon" style="background:var(--bl)">📢</div>
+        <div><div class="admin-title">Broadcast message</div><div class="admin-sub">Send notice to all officers</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('admin-mis')">
+        <div class="admin-icon" style="background:#F0EBF8">📊</div>
+        <div><div class="admin-title">MIS settings</div><div class="admin-sub">Configure and send MIS reports</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('admin-backup')">
+        <div class="admin-icon" style="background:#EAF3DE">☁️</div>
+        <div><div class="admin-title">Backup and restore</div><div class="admin-sub">Back up officer data, restore for new officer</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('admin-corrections')">
+        <div class="admin-icon" style="background:var(--al)">✏️</div>
+        <div><div class="admin-title">Corrections</div><div class="admin-sub">Modify attendance, orders, expenses with audit trail</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('admin-products')">
+        <div class="admin-icon" style="background:#DCF0FB">📦</div>
+        <div><div class="admin-title">Product management</div><div class="admin-sub">Add new products, toggle active/inactive</div></div>
+      </div>
+      <div class="admin-card" onclick="migrateLocalDataToSheet()">
+        <div class="admin-icon" style="background:#F0EBF8">☁️</div>
+        <div><div class="admin-title">Upload local data to Sheet</div><div class="admin-sub">One-time migration of stores, distributors, institutions</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('admin-expenses-view')">
+        <div class="admin-icon" style="background:#FFF3E0">💸</div>
+        <div><div class="admin-title">Expense summary</div><div class="admin-sub">View officer-wise expense totals</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('admin-attendance-view')">
+        <div class="admin-icon" style="background:#E3F2FD">📋</div>
+        <div><div class="admin-title">Attendance summary</div><div class="admin-sub">Today's attendance and day status</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('admin-holidays')">
+        <div class="admin-icon" style="background:#F0EBF8">🗓️</div>
+        <div><div class="admin-title">Holiday calendar</div><div class="admin-sub">Set universal, territory and company holidays</div></div>
+      </div>
+      <div class="admin-card" onclick="exportData()">
+        <div class="admin-icon" style="background:#F1EFE8">📤</div>
+        <div><div class="admin-title">Export data</div><div class="admin-sub">Download orders, attendance, expenses as CSV</div></div>
+      </div>
+
+      <div class="admin-card" onclick="switchTab('admin-territories')">
+        <div class="admin-icon" style="background:var(--gl)">🗺️</div>
+        <div><div class="admin-title">Territories</div><div class="admin-sub">Add or manage sales territories</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('master')">
+        <div class="admin-icon" style="background:var(--bl)">📋</div>
+        <div><div class="admin-title">Master data</div><div class="admin-sub">Stores, products, distributors</div></div>
+      </div>
+      <div class="admin-card" onclick="switchTab('dashboard')">
+        <div class="admin-icon" style="background:var(--al)">📊</div>
+        <div><div class="admin-title">Dashboard</div><div class="admin-sub">View all orders and team performance</div></div>
+      </div>
+      <div class="admin-card" onclick="adminForceRefreshAll()">
+        <div class="admin-icon" style="background:#FFF3E0">🔄</div>
+        <div><div class="admin-title">Force refresh — all officers</div><div class="admin-sub">Push a silent cache-clear to all officers' devices</div></div>
+      </div>
+      <div class="admin-card" onclick="pushAppUpdate()">
+        <div class="admin-icon" style="background:#FFF3E0">📲</div>
+        <div><div class="admin-title">Push app update</div><div class="admin-sub">Force all devices to load the latest version</div></div>
+      </div>
+    </div>
+
+    <!-- ADMIN TARGETS -->
+    <div id="tab-admin-targets" class="tab">
+      <div class="slabel" style="margin-top:0">Set monthly targets</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:14px">Set monthly order value target per officer. They will see their progress on the home screen.</div>
+      <div id="target-emp-list"></div>
+    </div>
+
+    <!-- ADMIN EXPENSE CONFIG -->
+    <div id="tab-admin-expenses-config" class="tab">
+      <div class="slabel" style="margin-top:0">Base fare configuration</div>
+      <div class="card">
+        <div class="field"><label>Local base fare (₹)</label><input type="number" id="cfg-local" placeholder="Enter amount" oninput="saveExpConfig()"></div>
+        <div class="field"><label>Ex-market base fare (₹)</label><input type="number" id="cfg-exmarket" placeholder="Enter amount" oninput="saveExpConfig()"></div>
+        <div class="field"><label>Ex-market with night stay base fare (₹)</label><input type="number" id="cfg-exmarket-night" placeholder="Enter amount" oninput="saveExpConfig()"></div>
+      </div>
+      <div class="slabel">Active target types</div>
+      <div class="card">
+        <div class="tog-wrap" onclick="toggleTargetType('monthly_order_value')">
+          <div class="tog-txt">Monthly order value target</div>
+          <div class="tog on" id="tt-monthly_order_value"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleTargetType('monthly_stores')">
+          <div class="tog-txt">Monthly stores visited target</div>
+          <div class="tog" id="tt-monthly_stores"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleTargetType('monthly_new_stores')">
+          <div class="tog-txt">Monthly new stores target</div>
+          <div class="tog" id="tt-monthly_new_stores"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleTargetType('monthly_institutions')">
+          <div class="tog-txt">Monthly institution visits target</div>
+          <div class="tog" id="tt-monthly_institutions"></div>
+        </div>
+      </div>
+      <div class="slabel">Mandatory fields</div>
+      <div class="card">
+        <div class="tog-wrap" onclick="toggleMandatory('store_mobile')">
+          <div class="tog-txt">Store mobile number mandatory</div>
+          <div class="tog" id="mf-store_mobile"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleMandatory('store_gstin')">
+          <div class="tog-txt">Store GSTIN mandatory</div>
+          <div class="tog" id="mf-store_gstin"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleMandatory('dist_gstin')">
+          <div class="tog-txt">Distributor GSTIN mandatory</div>
+          <div class="tog" id="mf-dist_gstin"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ADMIN BROADCAST -->
+    <div id="tab-admin-broadcast" class="tab">
+      <div class="slabel" style="margin-top:0">Broadcast message</div>
+      <div class="card-sub" style="margin-bottom:14px">Message will appear as a banner on all officers home screen when they next open the app.</div>
+      <div class="field"><label>Message <span class="req">*</span></label>
+        <textarea id="broadcast-msg" placeholder="e.g. New price list effective 1st July. Please check Files tab for updated price list." style="height:90px"></textarea>
+      </div>
+      <div class="field"><label>Expires on (optional)</label>
+        <input type="date" id="broadcast-expiry">
+      </div>
+      <button class="btn" onclick="saveBroadcast()">Send broadcast</button>
+      <div class="slabel">Active broadcasts</div>
+      <div id="broadcast-list"></div>
+    </div>
+
+    <!-- ADMIN MIS -->
+    <div id="tab-admin-mis" class="tab">
+      <div class="slabel" style="margin-top:0">MIS configuration</div>
+      <div class="card">
+        <div class="field"><label>Recipients (comma separated emails)</label>
+          <textarea id="mis-recipients" placeholder="gm@diabliss.in, ceo@diabliss.in, coo@diabliss.in" style="height:60px"></textarea>
+        </div>
+        <div class="field"><label>From email</label>
+          <input type="email" id="mis-from" placeholder="reports@diabliss.in" autocomplete="off">
+        </div>
+        <button class="btn-out" onclick="saveMISConfig()">Save configuration</button>
+      </div>
+      <div class="slabel">Report sections</div>
+      <div class="card">
+        <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Select what to include in each report type</div>
+        <div class="tog-wrap" onclick="toggleMISSection(0)">
+          <div class="tog-txt" style="font-size:12px">Orders — state wise</div>
+          <div class="tog on" id="mis-sec-0"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleMISSection(1)">
+          <div class="tog-txt" style="font-size:12px">Orders — officer wise</div>
+          <div class="tog on" id="mis-sec-1"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleMISSection(2)">
+          <div class="tog-txt" style="font-size:12px">Attendance summary</div>
+          <div class="tog on" id="mis-sec-2"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleMISSection(3)">
+          <div class="tog-txt" style="font-size:12px">New stores added</div>
+          <div class="tog on" id="mis-sec-3"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleMISSection(4)">
+          <div class="tog-txt" style="font-size:12px">Inactive stores</div>
+          <div class="tog on" id="mis-sec-4"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleMISSection(5)">
+          <div class="tog-txt" style="font-size:12px">Institution visits</div>
+          <div class="tog on" id="mis-sec-5"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleMISSection(6)">
+          <div class="tog-txt" style="font-size:12px">Invoices generated</div>
+          <div class="tog on" id="mis-sec-6"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleMISSection(7)">
+          <div class="tog-txt" style="font-size:12px">Top selling products</div>
+          <div class="tog on" id="mis-sec-7"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleMISSection(8)">
+          <div class="tog-txt" style="font-size:12px">Expense summary</div>
+          <div class="tog on" id="mis-sec-8"></div>
+        </div>
+        <div class="tog-wrap" onclick="toggleMISSection(9)">
+          <div class="tog-txt" style="font-size:12px">Territory performance</div>
+          <div class="tog on" id="mis-sec-9"></div>
+        </div>
+      </div>
+      <div class="slabel">Send now (on-demand)</div>
+      <div class="card">
+        <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Send MIS report immediately to all configured recipients.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <button class="btn btn-sm" onclick="sendMISNow('daily')">📊 Daily</button>
+          <button class="btn btn-sm" onclick="sendMISNow('weekly')">📊 Weekly</button>
+          <button class="btn btn-sm" onclick="sendMISNow('monthly')">📊 Monthly</button>
+        </div>
+        <button class="btn btn-sm" onclick="sendMISNow('ytd')" style="width:100%;margin-top:8px">📊 Year-to-date report</button>
+      </div>
+      <div class="slabel">Delivery log</div>
+      <div id="mis-log"></div>
+    </div>
+
+    <!-- ADMIN BACKUP -->
+    <div id="tab-admin-backup" class="tab">
+      <div class="slabel" style="margin-top:0">Backup and restore</div>
+      <div class="card">
+        <div class="card-title">☁️ Backup officer data</div>
+        <div class="card-sub" style="margin-bottom:12px">Backs up stores, distributors, institutions to admin Google Drive. Organised by officer and territory.</div>
+        <button class="btn" onclick="backupAllData()">Backup all data now</button>
+      </div>
+      <div class="card" style="margin-top:10px">
+        <div class="card-title">🔄 Territory handover</div>
+        <div class="card-sub" style="margin-bottom:12px">Transfer one officer territory data to another officer.</div>
+        <div class="field"><label>From officer</label>
+          <select id="handover-from"><option value="">Select officer</option></select>
+        </div>
+        <div class="field"><label>To officer</label>
+          <select id="handover-to"><option value="">Select officer</option></select>
+        </div>
+        <button class="btn" onclick="doHandover()">Transfer territory data</button>
+
+      </div>
+    </div>
+
+    <!-- EXPENSE SUMMARY TAB -->
+    <div id="tab-admin-expenses-view" class="tab">
+      <div class="slabel" style="margin-top:0">Expense summary</div>
+      <button class="btn-out btn-sm" onclick="renderAdminExpenseSummary()" style="margin-bottom:12px;width:100%">↻ Refresh</button>
+      <div id="admin-expense-summary-list"><div class="empty" style="padding:20px">Tap Refresh to load</div></div>
+    </div>
+
+    <!-- ATTENDANCE SUMMARY TAB -->
+    <div id="tab-admin-attendance-view" class="tab">
+      <div class="slabel" style="margin-top:0">Attendance</div>
+      <div class="field" style="margin-bottom:10px"><label>Date</label>
+        <input type="date" id="admin-att-date" onchange="renderAdminAttendanceSummary()" style="width:100%;padding:9px 10px;border:1.5px solid var(--bd);border-radius:var(--rads);font-size:14px">
+      </div>
+      <button class="btn-out btn-sm" onclick="renderAdminAttendanceSummary()" style="margin-bottom:12px;width:100%">↻ Refresh</button>
+      <div id="admin-attendance-list"><div class="empty" style="padding:20px">Tap Refresh to load</div></div>
+    </div>
+
+    <!-- PRODUCT MANAGEMENT TAB -->
+    <div id="tab-admin-products" class="tab">
+      <div class="slabel" style="margin-top:0">Product management</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:14px">Standard products are built-in. Add new products here — they appear in all officers' order booking.</div>
+
+      <!-- Add product form -->
+      <div class="add-form" style="margin-bottom:14px">
+        <div class="add-form-title">Add new product</div>
+        <div class="field"><label>Product name <span class="req">*</span></label>
+          <input type="text" id="np-name" placeholder="e.g. Diabliss Herbal Tea 250g" autocomplete="off">
+        </div>
+        <div class="field-row">
+          <div class="field"><label>MRP (₹) <span class="req">*</span></label>
+            <input type="number" id="np-mrp" placeholder="e.g. 199" min="0">
+          </div>
+          <div class="field"><label>Case qty <span class="req">*</span></label>
+            <input type="number" id="np-case" placeholder="e.g. 24" min="1">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Category</label>
+            <select id="np-category">
+              <option value="Sugar">Sugar</option>
+              <option value="Jaggery">Jaggery</option>
+              <option value="Tea">Tea</option>
+              <option value="Cookies">Cookies</option>
+              <option value="Jam">Jam</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field"><label>HSN Code</label>
+            <input type="text" id="np-hsn" placeholder="e.g. 1704" autocomplete="off">
+          </div>
+        </div>
+        <button class="btn" onclick="saveNewProduct()">Add product</button>
+      </div>
+
+      <!-- Product list -->
+      <div class="slabel">All products</div>
+      <div id="admin-product-list"></div>
+    </div>
+
+    <!-- HOLIDAY CALENDAR TAB -->
+    <div id="tab-admin-holidays" class="tab">
+      <div class="slabel" style="margin-top:0">Holiday calendar</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:14px">Holidays are automatically marked in attendance for all officers.</div>
+
+      <!-- Add holiday form -->
+      <div class="add-form" style="margin-bottom:14px">
+        <div class="add-form-title">Add holiday</div>
+        <div class="field-row">
+          <div class="field"><label>Date <span class="req">*</span></label>
+            <input type="date" id="hol-date">
+          </div>
+          <div class="field"><label>Type <span class="req">*</span></label>
+            <select id="hol-type">
+              <option value="universal">Universal</option>
+              <option value="territory">Territory specific</option>
+              <option value="company">Company holiday</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Holiday name <span class="req">*</span></label>
+          <input type="text" id="hol-name" placeholder="e.g. Pongal, Republic Day" autocomplete="off">
+        </div>
+        <div class="field" id="hol-territory-field" style="display:none">
+          <label>Territories <span class="req">*</span></label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px" id="hol-territory-checkboxes">
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg);padding:5px 10px;border-radius:20px;border:1px solid var(--bd)"><input type="checkbox" value="Chennai" class="hol-terr-cb" style="accent-color:var(--g)"> Chennai</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg);padding:5px 10px;border-radius:20px;border:1px solid var(--bd)"><input type="checkbox" value="ROTN" class="hol-terr-cb" style="accent-color:var(--g)"> ROTN</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg);padding:5px 10px;border-radius:20px;border:1px solid var(--bd)"><input type="checkbox" value="Kerala" class="hol-terr-cb" style="accent-color:var(--g)"> Kerala</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg);padding:5px 10px;border-radius:20px;border:1px solid var(--bd)"><input type="checkbox" value="AP" class="hol-terr-cb" style="accent-color:var(--g)"> AP</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg);padding:5px 10px;border-radius:20px;border:1px solid var(--bd)"><input type="checkbox" value="TS" class="hol-terr-cb" style="accent-color:var(--g)"> TS</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg);padding:5px 10px;border-radius:20px;border:1px solid var(--bd)"><input type="checkbox" value="Bangalore" class="hol-terr-cb" style="accent-color:var(--g)"> Bangalore</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg);padding:5px 10px;border-radius:20px;border:1px solid var(--bd)"><input type="checkbox" value="ROK" class="hol-terr-cb" style="accent-color:var(--g)"> ROK</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg);padding:5px 10px;border-radius:20px;border:1px solid var(--bd)"><input type="checkbox" value="Odisha" class="hol-terr-cb" style="accent-color:var(--g)"> Odisha</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg);padding:5px 10px;border-radius:20px;border:1px solid var(--bd)"><input type="checkbox" value="Others" class="hol-terr-cb" style="accent-color:var(--g)"> Others</label>
+          </div>
+        </div>
+        <button class="btn" onclick="saveHoliday()">Add holiday</button>
+      </div>
+
+      <!-- Filter by year/month -->
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <select id="hol-filter-year" onchange="renderHolidayList()" style="flex:1;padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--rads);font-size:13px;background:var(--w)">
+          <option value="2026">2026</option>
+          <option value="2027">2027</option>
+        </select>
+        <select id="hol-filter-territory" onchange="renderHolidayList()" style="flex:1;padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--rads);font-size:13px;background:var(--w)">
+          <option value="">All territories</option>
+          <option>Chennai</option><option>ROTN</option><option>Kerala</option>
+          <option>AP</option><option>TS</option><option>Bangalore</option>
+          <option>ROK</option><option>Odisha</option><option>Others</option>
+        </select>
+      </div>
+      <div id="holiday-list"></div>
+    </div>
+
+    <!-- ADMIN CORRECTIONS -->
+    <div id="tab-admin-corrections" class="tab">
+      <div class="slabel" style="margin-top:0">Corrections</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:14px">All changes are logged with reason and timestamp. Employee is notified by email.</div>
+
+      <div class="mtabs">
+        <div class="mtab on" onclick="switchCorrections(this,'corr-attendance')">Attendance</div>
+        <div class="mtab" onclick="switchCorrections(this,'corr-orders')">Orders</div>
+        <div class="mtab" onclick="switchCorrections(this,'corr-expenses')">Expenses</div>
+        <div class="mtab" onclick="switchCorrections(this,'corr-log')">Audit log</div>
+      </div>
+
+      <!-- ATTENDANCE CORRECTIONS -->
+      <div id="corr-attendance">
+        <div class="field-row">
+          <div class="field"><label>Select officer</label>
+            <select id="corr-att-officer" onchange="loadAttendanceForCorrection()">
+              <option value="">All officers</option>
+            </select>
+          </div>
+          <div class="field"><label>Select date</label>
+            <input type="date" id="corr-att-date" onchange="loadAttendanceForCorrection()">
+          </div>
+        </div>
+        <div id="corr-att-list"></div>
+      </div>
+
+      <!-- ORDER CORRECTIONS (Admin only) -->
+      <div id="corr-orders" style="display:none">
+        <div class="field-row">
+          <div class="field"><label>Search officer</label>
+            <input type="text" id="corr-ord-search" placeholder="Officer name..." autocomplete="off" oninput="loadOrdersForCorrection()">
+          </div>
+          <div class="field"><label>Date</label>
+            <input type="date" id="corr-ord-date" onchange="loadOrdersForCorrection()">
+          </div>
+        </div>
+        <div id="corr-ord-list"></div>
+      </div>
+
+      <!-- EXPENSE CORRECTIONS (Admin only) -->
+      <div id="corr-expenses" style="display:none">
+        <div class="field"><label>Select officer</label>
+          <select id="corr-exp-officer" onchange="loadExpensesForCorrection()">
+            <option value="">All officers</option>
+          </select>
+        </div>
+        <div id="corr-exp-list"></div>
+      </div>
+
+      <!-- AUDIT LOG -->
+      <div id="corr-log" style="display:none">
+        <div id="correction-audit-log"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN EMPLOYEES -->
+    <div id="tab-admin-employees" class="tab">
+      <div class="slabel" style="margin-top:0">Employee management</div>
+      <button class="btn-out" onclick="toggleForm('emp-add-form')">+ Add employee</button>
+      <input type="search" id="emp-search" placeholder="🔍 Search employees..." oninput="filterEmpList()" style="width:100%;padding:9px 10px;border:1.5px solid var(--bd);border-radius:var(--rads);font-size:14px;margin:8px 0;box-sizing:border-box">
+      <div id="emp-add-form" style="display:none" class="add-form">
+        <div class="add-form-title">Add employee</div>
+        <div class="field"><label>Full name <span class="req">*</span></label><input type="text" id="emp-name" autocomplete="off"></div>
+        <div class="field"><label>Mobile <span class="req">*</span></label><input type="tel" id="emp-mobile"></div>
+        <div class="field-row">
+          <div class="field"><label>Role <span class="req">*</span></label>
+            <select id="emp-role">
+              <option value="Officer">Officer</option>
+              <option value="ASM">ASM</option>
+              <option value="RSM">RSM</option>
+              <option value="GM">GM</option>
+              <option value="Sub-Admin">Sub-Admin</option>
+            </select>
+          </div>
+          <div class="field"><label>Territory</label>
+            <select id="emp-territory">
+              <option value="">All</option>
+              <option>Chennai</option><option>ROTN</option><option>Kerala</option>
+              <option>AP</option><option>TS</option><option>Bangalore</option>
+              <option>ROK</option><option>Odisha</option><option>Others</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Alert email(s) — comma separated for multiple</label><input type="text" id="emp-alert-email" placeholder="e.g. gm@diabliss.in, coo@diabliss.in" autocomplete="off"></div>
+        <div class="field"><label>Employee personal email</label><input type="email" id="emp-personal-email" placeholder="Employee's own email" autocomplete="off"></div>
+        <div class="field"><label>Reports to (ASM / RSM)</label><select id="emp-reports-to"><option value="">-- Select manager --</option></select></div>
+        <div class="field"><label>Also reports to (GM) <span style="font-size:11px;color:var(--t3)">(optional)</span></label><select id="emp-reports-to2"><option value="">-- Optional --</option></select></div>
+        <div class="field"><label>Alert mobile</label><input type="tel" id="emp-alert-mobile" placeholder="Mobile for SMS/WhatsApp alerts" autocomplete="off"></div>
+        <div class="field"><label>Notes</label><input type="text" id="emp-notes" autocomplete="off"></div>
+        <button class="btn" onclick="saveEmployee()">Save employee</button>
+      </div>
+      <div id="emp-list"></div>
+    </div>
+
+    <!-- ADMIN TERRITORIES -->
+    <div id="tab-admin-territories" class="tab">
+      <div class="slabel" style="margin-top:0">Territories</div>
+      <button class="btn-out" onclick="toggleForm('terr-add-form')">+ Add territory</button>
+      <div id="terr-add-form" style="display:none" class="add-form">
+        <div class="add-form-title">Add territory</div>
+        <div class="field"><label>Territory name <span class="req">*</span></label><input type="text" id="terr-name" autocomplete="off"></div>
+        <button class="btn" onclick="saveTerritory()">Save</button>
+      </div>
+      <div id="terr-list"></div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bot-nav" id="bot-nav">
+    <button class="bnav on" id="bn-home" onclick="switchTab('home')"><span class="bi">🏠</span>Home</button>
+    <button class="bnav" id="bn-visit" onclick="switchTab('visit')"><span class="bi">🏪</span>Visit</button>
+    <button class="bnav" id="bn-orders" onclick="switchTab('orders')"><span class="bi">📋</span>Orders</button>
+    <button class="bnav" id="bn-day" onclick="switchTab('day')"><span class="bi" id="bn-day-icon" style="font-size:20px;line-height:1">📅</span>Day</button>
+    <button class="bnav" id="bn-files" onclick="switchTab('files')"><span class="bi">📁</span>Files</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUWaomaTBhuUyce2HZ44o8I3m2Q1Nl7pEpat6qFPpE1cWZZDh18OeGN9RYted2a6hv/exec';
+  const SPREADSHEET_ID = '1KUV-ypJjagfufmDfcaON1Kb0cqRqaN6OlQebD6xVQpE';
+  // API_TOKEN must match the API_SECRET set in GAS Script Properties
+  // To set: GAS Editor → Project Settings → Script Properties → Add: API_SECRET = <your-token>
+  // Then set the same value here:
+  const API_TOKEN = ''; // ← FILL IN YOUR SECRET TOKEN HERE
+</script>
+<script src="pricing.js"></script>
+<script src="app-core.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+<script src="app-ui-helpers.js"></script>
+<script src="app-visit-flow.js"></script>
+<script src="app-admin-master.js"></script>
+<script src="app-dash-reports.js"></script>
+<script src="app-corrections.js"></script>
+<script src="app-targets-expenses.js"></script>
+<script src="app-ledger-invoice.js"></script>
+<script src="app-data-sync.js"></script>
+<script src="app-features-new.js"></script>
+<script src="app-features-v2.js"></script>
+<script src="app-chatbot.js"></script>
+<script>
+  // Init: run after all modules are loaded
+  (function(){
+    // Show app version
+    const el = document.getElementById('app-version-display');
+    if (el && typeof APP_VERSION !== 'undefined') el.textContent = 'v' + APP_VERSION;
+    // Render videos + quick links when files tab opens
+    const _origSwitchTabFiles = typeof switchTab === 'function' ? switchTab : null;
+    if (_origSwitchTabFiles) {
+      const __prev = switchTab;
+      switchTab = function(name) {
+        __prev(name);
+        if (name === 'files') { renderVideos(); renderQuickLinks(); if(typeof loadProductPhotos==='function')loadProductPhotos(); }
+      };
+    }
+    // Also render on initial load in case files tab is default
+    setTimeout(() => { renderVideos(); renderQuickLinks(); }, 800);
+    // Auto-add ✕ close button to every add-form
+    document.querySelectorAll('.add-form').forEach(form => {
+      const title = form.querySelector('.add-form-title');
+      if (!title) return;
+      if (title.querySelector('.add-form-close')) return; // avoid double-add
+      const x = document.createElement('span');
+      x.textContent = '✕';
+      x.className = 'add-form-close';
+      x.style.cssText = 'float:right;cursor:pointer;color:var(--t3);font-size:18px;line-height:1;padding-left:8px';
+      x.addEventListener('click', () => { form.style.display = 'none'; });
+      title.appendChild(x);
+    });
+  })();
+
+  // ══ VIDEOS ══
+  const _DEFAULT_VIDEOS = [
+    { id: 'kBVZShio7Tg', title: 'Diabliss Sugar — How it works', cat: 'Product Features' }
+  ];
+  function _getVideos() {
+    try { return JSON.parse(localStorage.getItem('dl_videos') || 'null') || _DEFAULT_VIDEOS; } catch(e) { return _DEFAULT_VIDEOS; }
+  }
+  function _saveVideos(v) { localStorage.setItem('dl_videos', JSON.stringify(v)); }
+  function _ytId(url) {
+    url = (url||'').trim();
+    const m = url.match(/(?:youtu\.be\/|v=|\/embed\/|\/shorts\/)([A-Za-z0-9_-]{11})/);
+    return m ? m[1] : (url.length === 11 ? url : null);
+  }
+  function renderVideos() {
+    const sec = document.getElementById('videos-section');
+    const editBtn = document.getElementById('videos-edit-btn');
+    if (!sec) return;
+    const role = (typeof CU !== 'undefined' && CU?.role) || '';
+    const canEdit = ['Admin','Sub-Admin'].includes(role);
+    if (editBtn) editBtn.style.display = canEdit ? 'inline-block' : 'none';
+    const videos = _getVideos();
+    const cats = ['Product Features','Testimonials','Recipes'];
+    const catIcons = {'Product Features':'🎯','Testimonials':'💬','Recipes':'🍳'};
+    let html = '';
+    cats.forEach(cat => {
+      const vids = videos.filter(v => v.cat === cat);
+      if (!vids.length) return;
+      const catId = 'vcat_' + cat.replace(/\s/g,'_');
+      const cardsHtml = vids.map((v,i) => {
+        const thumb = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`;
+        const url = `https://youtu.be/${v.id}`;
+        const idx = videos.indexOf(v);
+        return `<div style="background:var(--w);border:1px solid var(--bd);border-radius:var(--rad);overflow:hidden;margin-bottom:10px">
+          <div style="position:relative;cursor:pointer" onclick="window.open('${url}','_blank')">
+            <img src="${thumb}" alt="${v.title}" style="width:100%;height:auto;display:block" onerror="this.style.display='none'">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+              <div style="width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center">
+                <div style="width:0;height:0;border-style:solid;border-width:9px 0 9px 18px;border-color:transparent transparent transparent #fff;margin-left:3px"></div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:10px 12px;display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;font-weight:600;flex:1;margin-right:8px">${v.title}</div>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button class="btn-out btn-sm" onclick="window.open('${url}','_blank')" style="font-size:11px;padding:5px 10px">▶ Play</button>
+              <button class="btn-out btn-sm" onclick="(function(){const t='${v.title}\\n${url}';if(navigator.share){navigator.share({title:'${v.title}',url:'${url}'}).catch(()=>window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'))}else{window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}})()" style="font-size:11px;padding:5px 10px">📤</button>
+              ${canEdit ? `<button class="btn-out btn-sm" onclick="deleteVideo(${idx})" style="font-size:11px;padding:5px 8px;border-color:var(--r);color:var(--r)">🗑️</button>` : ''}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+      html += `<div style="background:var(--w);border:1px solid var(--bd);border-radius:var(--rad);margin-bottom:10px;overflow:hidden">
+        <div onclick="(function(el){const b=document.getElementById('${catId}');const open=b.style.display!=='none';b.style.display=open?'none':'block';el.querySelector('.vc-chev').textContent=open?'▸':'▾'})(this)" style="padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:13px;font-weight:600">${catIcons[cat]||''} ${cat} <span style="font-size:11px;color:var(--t3);font-weight:400">(${vids.length})</span></div>
+          <span class="vc-chev" style="font-size:14px;color:var(--t3)">▸</span>
+        </div>
+        <div id="${catId}" style="display:none;padding:0 10px 10px">
+          ${cardsHtml}
+        </div>
+      </div>`;
+    });
+    if (!html) html = '<div style="font-size:13px;color:var(--t3);padding:12px 0">No videos added yet.</div>';
+    sec.innerHTML = html;
+  }
+  function toggleVideoEditor() {
+    const p = document.getElementById('video-editor-panel');
+    if (!p) return;
+    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  }
+  function saveVideoEntry() {
+    const url = document.getElementById('ve-url')?.value.trim();
+    const title = document.getElementById('ve-title')?.value.trim();
+    const cat = document.getElementById('ve-cat')?.value;
+    const id = _ytId(url);
+    if (!id) { if(typeof toast==='function') toast('Invalid YouTube URL or ID'); return; }
+    if (!title) { if(typeof toast==='function') toast('Enter a title'); return; }
+    const videos = _getVideos();
+    videos.push({ id, title, cat });
+    _saveVideos(videos);
+    document.getElementById('ve-url').value = '';
+    document.getElementById('ve-title').value = '';
+    toggleVideoEditor();
+    renderVideos();
+    if(typeof toast==='function') toast('Video added ✅');
+  }
+  function deleteVideo(idx) {
+    const videos = _getVideos();
+    if (idx < 0 || idx >= videos.length) return;
+    const title = videos[idx].title;
+    if (!confirm('Remove "' + title + '"?')) return;
+    videos.splice(idx, 1);
+    _saveVideos(videos);
+    renderVideos();
+  }
+
+  // ══ QUICK LINKS — managers only ══
+  function renderQuickLinks() {
+    const sec = document.getElementById('quick-links-section');
+    if (!sec) return;
+    const role = (typeof CU !== 'undefined' && CU?.role) || '';
+    const managerRoles = ['Admin','Sub-Admin','GM','RSM','ASM'];
+    if (!managerRoles.includes(role)) { sec.innerHTML = ''; return; }
+    sec.innerHTML = `
+      <div style="font-size:11px;font-weight:700;color:var(--gd);text-transform:uppercase;letter-spacing:.07em;border-left:3px solid var(--g);padding-left:8px;margin-bottom:10px;margin-top:18px">Quick Links</div>
+      <div style="background:var(--w);border:1px solid var(--bd);border-radius:var(--rad);padding:14px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:22px;flex-shrink:0">📋</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;margin-bottom:3px">New Employee Registration Form</div>
+            <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Share with new or prospective employees to collect their details before joining.</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm" style="flex:1" onclick="window.open('https://docs.google.com/forms/d/1RziMxzZ2qzKq9NXAK3AONGVE5uG4y82abbg_CqMyBqA/viewform','_blank')">📋 Open Form</button>
+              <button class="btn-out btn-sm" style="flex:1" onclick="(function(){const url='https://docs.google.com/forms/d/1RziMxzZ2qzKq9NXAK3AONGVE5uG4y82abbg_CqMyBqA/viewform';const msg='Welcome to Diabliss! Please fill this form before joining so we can set up your profile.\\n\\n'+url;if(navigator.share){navigator.share({title:'Diabliss Employee Registration',url}).catch(()=>window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank'))}else{window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank')}})()">📤 Share</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // Dynamic Day tab date icon
+  function updateDayTabIcon() {
+    const el = document.getElementById('bn-day-icon');
+    if (!el) { setTimeout(updateDayTabIcon, 500); return; }
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+    const day = now.getDate();
+    const mon = now.toLocaleDateString('en-IN', { month: 'short', timeZone: 'Asia/Kolkata' }).toUpperCase();
+    el.innerHTML = `<span style="display:inline-flex;flex-direction:column;align-items:center;width:22px;height:22px;border-radius:5px;overflow:hidden;border:1.5px solid currentColor;line-height:1;font-style:normal">
+      <span style="background:var(--r);color:#fff;font-size:6px;font-weight:700;width:100%;text-align:center;padding:1px 0">${mon}</span>
+      <span style="font-size:10px;font-weight:800;color:var(--t);line-height:14px">${day}</span>
+    </span>`;
+    // Refresh at midnight
+    const msToMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1) - now;
+    setTimeout(updateDayTabIcon, msToMidnight + 1000);
+  }
+  setTimeout(updateDayTabIcon, 1000);
+</script></body>
+</html>
+

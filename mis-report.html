@@ -1,0 +1,1042 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://ndxbbuejunkawfomvjrl.supabase.co">
+<link rel="dns-prefetch" href="https://ndxbbuejunkawfomvjrl.supabase.co">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Diabliss MIS</title>
+<style>
+:root {
+  --navy:#0D1B2A; --blue:#159ADB; --gold:#F4A020;
+  --bg:#F0F4F8; --card:#FFFFFF; --border:#D1D9E0;
+  --t1:#0D1B2A; --t2:#3A4A5C; --t3:#6B7A8D;
+  --green:#1E8449; --red:#C0392B; --r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;font-size:16px}
+.page-wrap{max-width:860px;margin:0 auto;box-shadow:0 0 40px rgba(0,0,0,0.10)}
+
+/* ── LOGO BANNER ── */
+.hdr-banner{background:linear-gradient(to bottom,#ffffff 0%,#ffffff 50%,#1a3a5c 82%,#0D1B2A 100%)}
+.hdr-banner-logo{display:block;width:100%;padding:8px 16px 4px;text-align:center}
+.hdr-banner-logo img{height:45px;width:auto;display:block;margin:0 auto;object-fit:contain}
+.hdr-banner-bottom{display:flex;align-items:center;justify-content:space-between;padding:4px 14px 10px}
+.hdr-banner-title{font-size:15px;font-weight:700;color:rgba(255,255,255,0.95);flex:1;text-align:center}
+.hdr-banner-sub{font-size:12px;color:rgba(255,255,255,0.75);font-weight:500;white-space:nowrap}
+
+/* ── PERIOD TABS ── */
+.tabs-bar{background:linear-gradient(135deg,#0D1B2A,#185FA5);padding:0 4px 2px}
+.tabs{display:flex;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:11px 14px;font-size:14px;font-weight:600;color:rgba(255,255,255,0.65);cursor:pointer;white-space:nowrap;position:relative;transition:color .2s;flex-shrink:0;border-bottom:3px solid transparent}
+.tab.on{color:#fff;border-bottom-color:var(--blue)}
+.tab:hover:not(.on){color:rgba(255,255,255,0.9)}
+.custom-row{display:none;background:rgba(0,0,0,0.3);padding:10px 16px;gap:8px;align-items:center;flex-wrap:wrap}
+.custom-row.show{display:flex}
+.custom-row input[type=date]{padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.12);color:#fff;font-size:14px}
+.custom-row input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1)}
+.custom-row button{padding:7px 18px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#0D1B2A,#185FA5);padding:24px 20px 20px;text-align:center;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(21,154,219,0.25),transparent 70%);pointer-events:none}
+.hero-label{font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:8px}
+.hero-value{font-size:46px;font-weight:900;color:#fff;line-height:1;letter-spacing:-1px;position:relative;z-index:1}
+.hero-value .rupee{font-size:30px;vertical-align:middle;margin-right:2px}
+.hero-meta{font-size:15px;color:rgba(255,255,255,0.7);margin-top:10px;position:relative;z-index:1}
+.hero-meta span{margin:0 8px}
+
+/* ── TILES ── */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px}
+.tile{background:var(--card);border-radius:var(--r);padding:16px 10px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.07);opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .4s ease}
+.tile.visible{opacity:1;transform:translateY(0)}
+.tile-icon{font-size:22px;margin-bottom:6px}
+.tile-num{font-size:24px;font-weight:900;color:var(--blue);line-height:1}
+.tile-num.green{color:var(--green)}
+.tile-num.gold{color:var(--gold)}
+.tile-lbl{font-size:12px;color:var(--t3);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+
+/* ── SKELETON ── */
+.skel{background:linear-gradient(90deg,#e0e8f0 25%,#c8d4de 50%,#e0e8f0 75%);background-size:200% 100%;animation:skelShimmer 1.4s ease-in-out infinite;border-radius:10px}
+@keyframes skelShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-tile{height:90px;border-radius:var(--r)}
+.skel-card{height:72px;border-radius:var(--r);margin-bottom:10px}
+.skel-bar{height:16px;border-radius:6px;margin-bottom:12px}
+
+/* ── CONTENT ── */
+.content{padding:0 16px 80px}
+
+/* ── SECTION LABEL ── */
+.slabel{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.slabel::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── PODIUM ── */
+.podium-wrap{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin-bottom:6px}
+.podium-slot{display:flex;flex-direction:column;align-items:center;flex:1;max-width:130px;cursor:pointer}
+.podium-slot:hover .podium-avatar{transform:scale(1.08)}
+.podium-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff;margin-bottom:8px;position:relative;flex-shrink:0;transition:transform .2s}
+.podium-avatar.p1{width:60px;height:60px;font-size:19px;background:linear-gradient(135deg,#F4A020,#E8890A);box-shadow:0 0 0 3px rgba(244,160,32,0.3);animation:goldShimmer 2.5s ease-in-out infinite}
+@keyframes goldShimmer{0%,100%{box-shadow:0 0 0 3px rgba(244,160,32,0.3)}50%{box-shadow:0 0 0 8px rgba(244,160,32,0.12),0 0 24px rgba(244,160,32,0.2)}}
+.podium-avatar.p2{background:linear-gradient(135deg,#95A5B8,#7A8FA8)}
+.podium-avatar.p3{background:linear-gradient(135deg,#CD7F32,#B06A20)}
+.podium-rank{position:absolute;top:-7px;right:-5px;font-size:16px;line-height:1}
+.podium-name{font-size:14px;font-weight:700;text-align:center;color:var(--t1);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.podium-terr{font-size:12px;color:var(--t3);text-align:center;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.podium-val{font-size:15px;font-weight:800;text-align:center}
+.podium-val.p1{color:var(--gold)}
+.podium-val.p2{color:#7A8FA8}
+.podium-val.p3{color:#B06A20}
+.podium-base{border-radius:8px 8px 0 0;width:100%;margin-top:8px}
+.podium-base.p1{height:56px;background:linear-gradient(to top,#E8890A,#F4A020)}
+.podium-base.p2{height:38px;background:linear-gradient(to top,#7A8FA8,#95A5B8)}
+.podium-base.p3{height:26px;background:linear-gradient(to top,#B06A20,#CD7F32)}
+.podium-ground{height:6px;background:var(--border);border-radius:4px;margin-bottom:4px}
+.podium-tap-hint{text-align:center;font-size:12px;color:var(--t3);margin-bottom:4px}
+
+/* ── PRODUCT HEAT GRID ── */
+.heat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.heat-card{background:#fff;border-radius:12px;padding:14px 16px;cursor:pointer;border:1px solid var(--border);border-left:5px solid #ccc;transition:transform .15s,box-shadow .15s;opacity:0;transform:scale(0.92);transition:opacity .35s ease,transform .35s ease}
+.heat-card.visible{opacity:1;transform:scale(1)}
+.heat-card:active{transform:scale(0.97);box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.heat-rank{font-size:12px;font-weight:700;color:var(--t3);margin-bottom:4px}
+.heat-name{font-size:14px;font-weight:700;color:var(--t1);line-height:1.3;margin-bottom:6px}
+.heat-qty{font-size:26px;font-weight:900;line-height:1}
+.heat-qty-lbl{font-size:11px;color:var(--t3);font-weight:600;margin-top:2px}
+.heat-bar-track{height:4px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
+.heat-bar-fill{height:100%;border-radius:2px;width:0%;transition:width .8s cubic-bezier(.25,.46,.45,.94)}
+.hc-1{border-left-color:#C0392B}.hc-1 .heat-qty{color:#C0392B}.hc-1 .heat-bar-fill{background:#C0392B}
+.hc-2{border-left-color:#D35400}.hc-2 .heat-qty{color:#D35400}.hc-2 .heat-bar-fill{background:#D35400}
+.hc-3{border-left-color:#B7950B}.hc-3 .heat-qty{color:#B7950B}.hc-3 .heat-bar-fill{background:#B7950B}
+.hc-4{border-left-color:#1E8449}.hc-4 .heat-qty{color:#1E8449}.hc-4 .heat-bar-fill{background:#1E8449}
+.hc-5{border-left-color:#1A5276}.hc-5 .heat-qty{color:#1A5276}.hc-5 .heat-bar-fill{background:#1A5276}
+.hc-6{border-left-color:#6C3483}.hc-6 .heat-qty{color:#6C3483}.hc-6 .heat-bar-fill{background:#6C3483}
+.hc-7{border-left-color:#117864}.hc-7 .heat-qty{color:#117864}.hc-7 .heat-bar-fill{background:#117864}
+.hc-8{border-left-color:#784212}.hc-8 .heat-qty{color:#784212}.hc-8 .heat-bar-fill{background:#784212}
+
+/* ── TERRITORY CARDS ── */
+.tcard{background:var(--card);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:5px solid var(--tc,var(--blue));opacity:0;transform:translateY(10px);transition:opacity .4s ease,transform .4s ease}
+.tcard.visible{opacity:1;transform:translateY(0)}
+.tcard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;cursor:pointer}
+.tcard-name{font-size:17px;font-weight:700;color:var(--t1)}
+.tcard-chev{font-size:13px;color:var(--t3);transition:transform .25s;margin-left:6px;display:inline-block}
+.tcard.open .tcard-chev{transform:rotate(90deg)}
+.tcard-val{font-size:18px;font-weight:800;color:var(--tc,var(--blue))}
+.tcard-meta{font-size:13px;color:var(--t3);margin-top:2px}
+.tcard-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden;cursor:pointer}
+.tcard-fill{height:100%;border-radius:4px;width:0%;transition:width .8s cubic-bezier(.25,.46,.45,.94)}
+.tcard-expand{display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
+.tcard.open .tcard-expand{display:block}
+.tcard-zero .tcard-name{color:var(--t3)}
+.tcard-zero .tcard-val{color:var(--t3)}
+
+/* ── OFFICER GRID ── */
+.officer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ofc-card{background:var(--bg);border-radius:10px;padding:13px;cursor:pointer;transition:box-shadow .15s;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease}
+.ofc-card.visible{opacity:1;transform:translateY(0)}
+.ofc-card:active{box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+.ofc-top{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.ofc-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;position:relative}
+.ofc-rank-badge{position:absolute;top:-5px;right:-5px;font-size:11px;background:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+.ofc-name{font-size:14px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t1)}
+.ofc-meta{font-size:12px;color:var(--t3);margin-top:2px}
+.ofc-val{font-size:17px;font-weight:800;color:var(--blue);margin-top:4px}
+.ofc-bar-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+.ofc-bar-fill{height:100%;border-radius:2px;width:0%;transition:width .7s cubic-bezier(.25,.46,.45,.94)}
+.av-0{background:linear-gradient(135deg,#159ADB,#0D7AB5)}
+.av-1{background:linear-gradient(135deg,#1E8449,#145A32)}
+.av-2{background:linear-gradient(135deg,#7D3C98,#6C3483)}
+.av-3{background:linear-gradient(135deg,#CA6F1E,#A04000)}
+.av-4{background:linear-gradient(135deg,#CB4335,#A93226)}
+.av-5{background:linear-gradient(135deg,#148F77,#0E6655)}
+.av-6{background:linear-gradient(135deg,#1F618D,#154360)}
+.av-7{background:linear-gradient(135deg,#D68910,#B7770D)}
+
+/* ── DEEP DRILL DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;opacity:0;transition:opacity .2s}
+.drawer-overlay.open{display:block;opacity:1}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:min(440px,100vw);background:#fff;z-index:201;transform:translateX(100%);transition:transform .28s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;overflow:hidden;box-shadow:-4px 0 24px rgba(0,0,0,0.2)}
+.drawer.open{transform:translateX(0)}
+.drawer-hdr{background:linear-gradient(135deg,#0D1B2A,#185FA5);color:#fff;padding:14px 16px;padding-top:max(14px,env(safe-area-inset-top));display:flex;align-items:center;gap:10px;flex-shrink:0}
+.drawer-close{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.drawer-name{font-size:17px;font-weight:700;flex:1}
+.drawer-sub{font-size:12px;color:rgba(255,255,255,0.65);margin-top:2px}
+.drawer-tabs{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:2px solid var(--border);background:#fff;flex-shrink:0}
+.drawer-tabs::-webkit-scrollbar{display:none}
+.dtab{flex-shrink:0;padding:11px 13px;font-size:13px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap}
+.dtab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.drawer-body{flex:1;overflow-y:auto;padding:16px}
+
+/* Drawer tiles */
+.d-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.d-tile{background:var(--bg);border-radius:10px;padding:13px;text-align:center}
+.d-tile-num{font-size:22px;font-weight:900;color:var(--blue)}
+.d-tile-lbl{font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;font-weight:600}
+
+/* Mini bar chart */
+.mini-chart{margin-bottom:16px;background:var(--bg);border-radius:10px;padding:12px}
+.mini-chart-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:10px}
+.mini-bars{display:flex;align-items:flex-end;gap:5px;height:52px}
+.mini-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.mini-bar{width:100%;border-radius:3px 3px 0 0;background:var(--blue);min-height:3px;transition:height .6s cubic-bezier(.25,.46,.45,.94)}
+.mini-bar.today{background:var(--gold)}
+.mini-bar-lbl{font-size:10px;color:var(--t3);text-align:center;font-weight:600}
+
+/* Drawer sections */
+.d-slabel{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+.d-slabel::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Store cards in drawer */
+.d-store-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.d-store-head{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background .1s}
+.d-store-head:hover{background:#f8fafc}
+.d-store-name{font-size:15px;font-weight:700;color:var(--t1)}
+.d-store-meta{font-size:12px;color:var(--t3);margin-top:2px}
+.d-store-val{font-size:16px;font-weight:800;color:var(--green);flex-shrink:0;margin-left:10px}
+.d-store-body{display:none;border-top:1.5px solid var(--border);padding:12px 14px}
+.d-store-card.open .d-store-body{display:block}
+
+/* SKU rows */
+.d-sku-row{display:flex;justify-content:space-between;align-items:center;font-size:14px;padding:6px 0;border-bottom:1px dashed var(--border)}
+.d-sku-row:last-child{border-bottom:none}
+.d-sku-name{color:var(--t2);flex:1}
+.d-sku-qty{font-size:15px;font-weight:700;color:var(--t1);margin-left:8px}
+
+/* Stock / damaged sections */
+.d-section-toggle{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:700;color:var(--blue);cursor:pointer;padding:8px 0 6px;margin-top:6px;border-top:1px solid var(--border)}
+.d-section-chev{transition:transform .2s;display:inline-block;font-size:12px}
+.d-section-toggle.open .d-section-chev{transform:rotate(180deg)}
+.d-section-body{display:none;margin-top:4px}
+.d-section-toggle.open+.d-section-body{display:block}
+
+/* Maps link */
+.d-maps-link{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--blue);text-decoration:none;margin-top:8px;font-weight:600}
+
+/* Product drill-down overlay */
+.prod-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:none;align-items:flex-end;justify-content:center}
+.prod-overlay.open{display:flex}
+.prod-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;padding:20px}
+.prod-sheet-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.prod-sheet-title{font-size:17px;font-weight:800;color:var(--t1)}
+.prod-sheet-close{background:none;border:none;font-size:22px;color:var(--t3);cursor:pointer;line-height:1}
+
+/* Drawer loading */
+.drawer-loading{text-align:center;padding:36px;color:var(--t3);font-size:15px}
+.drawer-spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+
+/* Empty / error */
+.state{background:var(--card);border-radius:var(--r);padding:44px 20px;text-align:center;margin-top:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.state .icon{font-size:40px;margin-bottom:12px}
+.state .stitle{font-size:17px;font-weight:700;margin-bottom:6px}
+.state .ssub{font-size:14px;color:var(--t2)}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.footer{text-align:center;font-size:13px;color:var(--t3);padding:20px}
+
+/* Territory colors */
+.tc-0{--tc:#159ADB}.tc-1{--tc:#1E8449}.tc-2{--tc:#E67E22}.tc-3{--tc:#9B59B6}
+.tc-4{--tc:#E74C3C}.tc-5{--tc:#1ABC9C}.tc-6{--tc:#2980B9}.tc-7{--tc:#F39C12}
+.tc-8{--tc:#884EA0}
+
+@media(max-width:480px){
+  .tiles{grid-template-columns:repeat(3,1fr)}
+  .hero-value{font-size:38px}
+  .officer-grid{grid-template-columns:1fr 1fr}
+  .heat-grid{grid-template-columns:1fr 1fr}
+  .d-tiles{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- DEEP DRILL DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="officerDrawer">
+  <div class="drawer-hdr">
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    <div>
+      <div class="drawer-name" id="drawerOfficerName">Officer</div>
+      <div class="drawer-sub" id="drawerOfficerSub"></div>
+    </div>
+  </div>
+  <div class="drawer-tabs" id="drawerTabs">
+    <div class="dtab on" data-dp="today" onclick="selectDrawerPeriod(this)">Today</div>
+    <div class="dtab" data-dp="yesterday" onclick="selectDrawerPeriod(this)">Yesterday</div>
+    <div class="dtab" data-dp="thisweek" onclick="selectDrawerPeriod(this)">This Week</div>
+    <div class="dtab" data-dp="lastweek" onclick="selectDrawerPeriod(this)">Last Week</div>
+    <div class="dtab" data-dp="thismonth" onclick="selectDrawerPeriod(this)">This Month</div>
+    <div class="dtab" data-dp="lastmonth" onclick="selectDrawerPeriod(this)">Last Month</div>
+    <div class="dtab" data-dp="ytd" onclick="selectDrawerPeriod(this)">YTD</div>
+    <div class="dtab" data-dp="custom" onclick="selectDrawerPeriod(this)">Custom ▾</div>
+  </div>
+  <div id="drawerCustomRow" style="display:none;padding:8px 14px;background:#f0f4f8;border-bottom:1px solid var(--border);display:none;gap:8px;align-items:center;flex-wrap:wrap">
+    <input type="date" id="drawerFrom" style="padding:6px 8px;border-radius:6px;border:1px solid var(--border);font-size:13px">
+    <span style="color:var(--t3);font-size:13px">to</span>
+    <input type="date" id="drawerTo" style="padding:6px 8px;border-radius:6px;border:1px solid var(--border);font-size:13px">
+    <button onclick="loadDrawerCustom()" style="padding:6px 14px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">Load</button>
+  </div>
+  <div class="drawer-body" id="drawerBody">
+    <div class="drawer-loading"><div class="drawer-spinner"></div>Loading…</div>
+  </div>
+</div>
+
+<!-- PRODUCT DRILL-DOWN OVERLAY -->
+<div class="prod-overlay" id="prodOverlay" onclick="closeProdOverlay(event)">
+  <div class="prod-sheet" id="prodSheet" onclick="event.stopPropagation()">
+    <div class="prod-sheet-hdr">
+      <div class="prod-sheet-title" id="prodSheetTitle">Product Detail</div>
+      <button class="prod-sheet-close" onclick="closeProdOverlay()">✕</button>
+    </div>
+    <div id="prodSheetBody"></div>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+<!-- LOGO BANNER -->
+<div class="hdr-banner">
+  <div class="hdr-banner-logo">
+    <img src="https://lowgifoods.co.in/diabliss-sales-app/Diabliss_Logo_App_Top.png"
+         alt="Diabliss"
+         onerror="this.src='https://lowgifoods.co.in/diabliss-sales-app/Diabliss_Logo-01.png'">
+  </div>
+  <div class="hdr-banner-bottom">
+    <div class="hdr-banner-title">MIS Reports</div>
+    <div class="hdr-banner-sub" id="genAt"></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tabs" id="tabs">
+    <div class="tab" data-p="yesterday">Yesterday</div>
+    <div class="tab on" data-p="today">Today</div>
+    <div class="tab" data-p="thisweek">This Week</div>
+    <div class="tab" data-p="lastweek">Last Week</div>
+    <div class="tab" data-p="thismonth">This Month</div>
+    <div class="tab" data-p="lastmonth">Last Month</div>
+    <div class="tab" data-p="ytd">Year to Date</div>
+    <div class="tab" data-p="custom">Custom ▾</div>
+  </div>
+  <div class="custom-row" id="customRow">
+    <input type="date" id="fromDate">
+    <span style="color:rgba(255,255,255,0.6);font-size:13px">to</span>
+    <input type="date" id="toDate">
+    <button onclick="loadCustom()">Load</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Total Revenue</div>
+  <div class="hero-value"><span class="rupee">₹</span><span id="hero-num">0</span></div>
+  <div class="hero-meta" id="hero-meta">
+    <span id="hm-orders">—</span> orders · <span id="hm-stores">—</span> stores · <span id="hm-officers">—</span> active
+  </div>
+</div>
+
+<!-- TILES -->
+<div class="tiles" id="tiles">
+  <div class="skel skel-tile"></div>
+  <div class="skel skel-tile"></div>
+  <div class="skel skel-tile"></div>
+</div>
+
+<!-- CONTENT -->
+<div class="content" id="content">
+  <div class="skel skel-card"></div>
+  <div class="skel skel-card"></div>
+  <div class="skel skel-bar" style="width:75%"></div>
+  <div class="skel skel-bar" style="width:55%"></div>
+</div>
+
+<div class="footer" id="mis-footer">Diabliss Sales App · Diabliss Consumer Products Pvt Ltd</div>
+</div>
+
+<script>
+const GAS = 'https://script.google.com/macros/s/AKfycbzznExu7LAHKDdsTuSIWr4wSAwCojqpDeKKwbCTZBO3Al-Zci244jva788dTFWz74Hf/exec';
+const SUPABASE_URL = 'https://ndxbbuejunkawfomvjrl.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5keGJidWVqdW5rYXdmb212anJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NDI5NjEsImV4cCI6MjEwMTUxODk2MX0.gKn6Slz3SX9LacwKJU3uN9Pw3BO3PKlh3TBwDxxFj-4';
+const MIS_VERSION = '1.7.177';
+const ALL_TERRITORIES = ['Chennai','ROTN','Kerala','AP','TS','Bangalore','ROK','Odisha','Others'];
+const TERR_COLORS = ['#159ADB','#1E8449','#E67E22','#9B59B6','#E74C3C','#1ABC9C','#2980B9','#F39C12','#884EA0'];
+
+/* ── SUPABASE QUERY ── */
+async function fetchFromSupabase(from, to) {
+  const url = SUPABASE_URL + '/rest/v1/orders?select=*&order_date=gte.' + from + '&order_date=lte.' + to + '&order=order_date.asc&limit=5000';
+  const res = await fetch(url, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY
+    }
+  });
+  if (!res.ok) throw new Error('Supabase error: ' + res.status);
+  return await res.json();
+}
+
+function buildReportFromRows(rows, from, to) {
+  const hierarchy = {};
+  const productMap = {};
+  let totalValue = 0;
+  const storeSet = new Set();
+  const officerSet = new Set();
+
+  rows.forEach(r => {
+    if (!r.id) return;
+    const terr = r.territory || 'Unknown';
+    const mobile = r.officer_mobile || r.officer || 'unknown';
+    const store = r.store || 'Unknown';
+    const total = parseFloat(r.grand_total) || 0;
+    const products = r.products || '';
+
+    totalValue += total;
+    storeSet.add(store);
+    officerSet.add(mobile);
+
+    if (!hierarchy[terr]) hierarchy[terr] = {};
+    if (!hierarchy[terr][mobile]) hierarchy[terr][mobile] = {
+      name: r.officer || mobile, mobile, orders: 0, value: 0, stores: {}, km: null
+    };
+    hierarchy[terr][mobile].orders++;
+    hierarchy[terr][mobile].value += total;
+
+    if (!hierarchy[terr][mobile].stores[store]) hierarchy[terr][mobile].stores[store] = {
+      name: store, city: r.store_city || '', distributor: r.distributor || '',
+      orders: 0, value: 0, orderList: []
+    };
+    hierarchy[terr][mobile].stores[store].orders++;
+    hierarchy[terr][mobile].stores[store].value += total;
+    hierarchy[terr][mobile].stores[store].orderList.push({
+      id: r.id, date: r.order_date, time: r.order_time || '',
+      products, value: total, notes: r.notes || '',
+      auditSummary: r.audit_summary || '',
+      latitude: r.latitude || '', longitude: r.longitude || '',
+      address: r.address || '', mapLink: r.map_link || ''
+    });
+
+    // Products
+    if (products && !products.startsWith('NO ORDER')) {
+      products.split(/[|;,]/).forEach(seg => {
+        seg = seg.trim(); if (!seg) return;
+        const m = seg.match(/^(.+?)[×x](\d+)@₹?([\d.]+)/i);
+        if (!m) return;
+        const name = m[1].trim(), qty = parseInt(m[2]), price = parseFloat(m[3]);
+        const val = qty * price;
+        if (!productMap[name]) productMap[name] = { name, qty: 0, orders: 0, value: 0 };
+        productMap[name].qty += qty;
+        productMap[name].orders++;
+        productMap[name].value += val;
+      });
+    }
+  });
+
+  const territories = Object.entries(hierarchy).map(([tName, officers]) => {
+    const offList = Object.values(officers).map(o => ({
+      name: o.name, mobile: o.mobile, orders: o.orders,
+      value: Math.round(o.value), stores: Object.keys(o.stores).length, km: o.km,
+      storeList: Object.values(o.stores).map(s => ({...s, value: Math.round(s.value)}))
+    })).sort((a,b) => b.value - a.value);
+    return {
+      name: tName,
+      orders: offList.reduce((a,o)=>a+o.orders,0),
+      value: Math.round(offList.reduce((a,o)=>a+o.value,0)),
+      officers: offList
+    };
+  }).filter(t => t.orders > 0).sort((a,b) => b.value - a.value);
+
+  const products = Object.values(productMap)
+    .sort((a,b) => b.value - a.value).slice(0,10)
+    .map(p => ({...p, value: Math.round(p.value),
+      pct: totalValue > 0 ? Math.round(p.value/totalValue*100) : 0}));
+
+  return {
+    from, to,
+    periodLabel: from === to ? from : from + ' to ' + to,
+    generatedAt: new Date().toLocaleString('en-IN', {timeZone:'Asia/Kolkata'}),
+    totals: { orders: rows.length, value: Math.round(totalValue), stores: storeSet.size, officers: officerSet.size },
+    territories, products
+  };
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const f=document.getElementById('mis-footer');
+  if(f) f.textContent='Diabliss Sales App v'+MIS_VERSION+' · Diabliss Consumer Products Pvt Ltd';
+});
+
+/* ── DATE HELPERS ── */
+function toIST(d){ return d.toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'}); }
+function istNow(){ return new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'})); }
+function getRange(p){
+  const d=istNow(), today=toIST(d);
+  switch(p){
+    case 'today': return {from:today,to:today,label:'Today — '+d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'Asia/Kolkata'})};
+    case 'yesterday':{const y=new Date(d);y.setDate(d.getDate()-1);const yk=toIST(y);return{from:yk,to:yk,label:'Yesterday — '+y.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'Asia/Kolkata'})};}
+    case 'thisweek':{const m=new Date(d);m.setDate(d.getDate()-((d.getDay()+6)%7));return{from:toIST(m),to:today,label:'This Week'};}
+    case 'lastweek':{const m=new Date(d);m.setDate(d.getDate()-((d.getDay()+6)%7)-7);const s=new Date(m);s.setDate(m.getDate()+6);return{from:toIST(m),to:toIST(s),label:'Last Week'};}
+    case 'thismonth':{const m=new Date(d.getFullYear(),d.getMonth(),1);return{from:toIST(m),to:today,label:'This Month — '+d.toLocaleDateString('en-IN',{month:'long',year:'numeric',timeZone:'Asia/Kolkata'})};}
+    case 'lastmonth':{const m=new Date(d.getFullYear(),d.getMonth()-1,1);const e=new Date(d.getFullYear(),d.getMonth(),0);return{from:toIST(m),to:toIST(e),label:'Last Month — '+m.toLocaleDateString('en-IN',{month:'long',year:'numeric',timeZone:'Asia/Kolkata'})};}
+    case 'ytd':{const m=new Date(d.getFullYear(),0,1);return{from:toIST(m),to:today,label:'Year to Date '+d.getFullYear()};}
+    default:return{from:today,to:today,label:'Today'};
+  }
+}
+
+/* ── FORMAT ── */
+function fmtFull(v){ return '₹'+Number(v||0).toLocaleString('en-IN'); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function initials(name){ return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+
+/* ── COUNT-UP ── */
+function countUp(el,target,prefix,suffix,dur){
+  if(!el) return;
+  const start=performance.now();
+  function step(now){
+    const p=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    const val=Math.round(target*ease);
+    el.textContent=prefix+val.toLocaleString('en-IN')+suffix;
+    if(p<1) requestAnimationFrame(step);
+    else el.textContent=prefix+target.toLocaleString('en-IN')+suffix;
+  }
+  requestAnimationFrame(step);
+}
+
+/* ── STAGGER VISIBLE ── */
+function staggerVisible(selector,delay){
+  document.querySelectorAll(selector).forEach((el,i)=>{
+    setTimeout(()=>el.classList.add('visible'),delay+i*80);
+  });
+}
+
+/* ── ANIMATE BARS ── */
+function animateBars(){
+  document.querySelectorAll('[data-w]').forEach(el=>{
+    setTimeout(()=>{ el.style.width=el.dataset.w+'%'; },60);
+  });
+}
+
+/* ── RENDER TILES ── */
+function renderTiles(t){
+  const orders=t.orders||0, value=t.value||0, stores=t.stores||0, officers=t.officers||0;
+  document.getElementById('hero-num').textContent='0';
+  setTimeout(()=>countUp(document.getElementById('hero-num'),value,'','',1000),100);
+  setTimeout(()=>{
+    countUp(document.getElementById('hm-orders'),orders,'','',700);
+    countUp(document.getElementById('hm-stores'),stores,'','',700);
+    countUp(document.getElementById('hm-officers'),officers,'','',700);
+  },300);
+  document.getElementById('tiles').innerHTML=[
+    {icon:'📦',num:orders,lbl:'Orders',cls:''},
+    {icon:'🏪',num:stores,lbl:'Stores',cls:'green'},
+    {icon:'👤',num:officers,lbl:'Officers',cls:'gold'},
+  ].map((d,i)=>`<div class="tile" style="transition-delay:${i*80}ms">
+    <div class="tile-icon">${d.icon}</div>
+    <div class="tile-num ${d.cls}" id="tn${i}">0</div>
+    <div class="tile-lbl">${d.lbl}</div>
+  </div>`).join('');
+  setTimeout(()=>{
+    staggerVisible('.tile',0);
+    countUp(document.getElementById('tn0'),orders,'','',700);
+    countUp(document.getElementById('tn1'),stores,'','',700);
+    countUp(document.getElementById('tn2'),officers,'','',700);
+  },100);
+}
+
+/* ── RENDER CONTENT ── */
+let _currentData = null;
+
+function renderContent(data){
+  _currentData = data;
+  const terrs=data.territories||[];
+  const prods=data.products||[];
+  let h='';
+
+  /* -- PODIUM -- */
+  const allOff=[];
+  terrs.forEach(t=>(t.officers||[]).forEach(o=>allOff.push({...o,territory:t.name})));
+  const sorted=[...allOff].sort((a,b)=>b.value-a.value);
+
+  if(sorted.length>=1){
+    const slots = sorted.length>=3
+      ? [sorted[1],sorted[0],sorted[2]]
+      : sorted.length===2 ? [null,sorted[0],sorted[1]]
+      : [null,sorted[0],null];
+    const rankMap=[2,1,3];
+    h+='<div class="slabel">🏆 Leaderboard</div>';
+    h+='<div class="podium-wrap">';
+    slots.forEach((o,pi)=>{
+      if(!o){h+='<div style="flex:1"></div>';return;}
+      const rank=rankMap[pi];
+      const cls=`p${rank}`;
+      const emoji=rank===1?'🥇':rank===2?'🥈':'🥉';
+      const avCls=`av-${sorted.indexOf(o)%8}`;
+      h+=`<div class="podium-slot" onclick="openOfficerDrawer('${esc(o.name)}','${esc(o.mobile||'')}','${esc(o.territory)}')">
+        <div class="podium-avatar ${cls}">${initials(o.name)}<span class="podium-rank">${emoji}</span></div>
+        <div class="podium-name">${esc(o.name)}</div>
+        <div class="podium-terr">${esc(o.territory)}</div>
+        <div class="podium-val ${cls}">${fmtFull(o.value)}</div>
+        <div class="podium-base ${cls}"></div>
+      </div>`;
+    });
+    h+='</div><div class="podium-ground"></div>';
+    h+='<div class="podium-tap-hint">Tap any officer to see full drill-down →</div>';
+  }
+
+  /* -- PRODUCT HEAT GRID -- */
+  if(prods.length){
+    const maxQ=Math.max(...prods.map(p=>p.qty||0),1);
+    h+='<div class="slabel">🔥 Product Heat</div>';
+    h+='<div class="heat-grid">';
+    prods.slice(0,8).forEach((p,i)=>{
+      const hcCls=`hc-${Math.min(i+1,8)}`;
+      const w=Math.round((p.qty||0)/maxQ*100);
+      h+=`<div class="heat-card ${hcCls}" style="transition-delay:${i*55}ms" onclick="openProdDrill('${esc(p.name)}')">
+        <div class="heat-rank">#${i+1}</div>
+        <div class="heat-name">${esc(p.name)}</div>
+        <div class="heat-qty">${p.qty||0}</div>
+        <div class="heat-qty-lbl">units sold</div>
+        <div class="heat-bar-track"><div class="heat-bar-fill" data-w="${w}"></div></div>
+      </div>`;
+    });
+    h+='</div>';
+  }
+
+  /* -- TERRITORY SCORECARDS (all 9 always) -- */
+  const terrMap={};
+  terrs.forEach(t=>{ terrMap[t.name]=t; });
+  const allTerrs=ALL_TERRITORIES.map(name=>terrMap[name]||{name,orders:0,value:0,officers:[]});
+  const maxV=Math.max(...allTerrs.map(t=>t.value||0),1);
+
+  h+='<div class="slabel">📍 Territory Scorecard</div>';
+  allTerrs.forEach((t,ti)=>{
+    const color=TERR_COLORS[ti%TERR_COLORS.length];
+    const w=Math.round((t.value||0)/maxV*100);
+    const isZero=!t.orders;
+    const offs=(t.officers||[]).sort((a,b)=>b.value-a.value);
+    let offGrid='';
+    const maxOV=Math.max(...offs.map(o=>o.value||0),1);
+    offs.forEach((o,oi)=>{
+      const ow=Math.round((o.value||0)/maxOV*100);
+      const avCls=`av-${(ti*4+oi)%8}`;
+      const rankBadge=oi===0?'🥇':oi===1?'🥈':oi===2?'🥉':'';
+      offGrid+=`<div class="ofc-card" style="transition-delay:${oi*60}ms"
+        onclick="openOfficerDrawer('${esc(o.name)}','${esc(o.mobile||'')}','${esc(t.name)}')">
+        <div class="ofc-top">
+          <div class="ofc-avatar ${avCls}">${initials(o.name)}${rankBadge?`<span class="ofc-rank-badge">${rankBadge}</span>`:''}</div>
+          <div><div class="ofc-name">${esc(o.name)}</div><div class="ofc-meta">${o.orders} orders · ${o.stores||0} stores</div></div>
+        </div>
+        <div class="ofc-val">${fmtFull(o.value)}</div>
+        <div class="ofc-bar-track"><div class="ofc-bar-fill" data-w="${ow}" style="background:${color}"></div></div>
+      </div>`;
+    });
+
+    h+=`<div class="tcard tc-${ti}${isZero?' tcard-zero':''}" id="tc${ti}" style="transition-delay:${ti*70}ms">
+      <div class="tcard-top" onclick="toggleTcard(this.parentElement)">
+        <div>
+          <div class="tcard-name">${esc(t.name)} <span class="tcard-chev">▶</span></div>
+          <div class="tcard-meta">${offs.length} officer(s) · ${t.orders} orders</div>
+        </div>
+        <div style="text-align:right">
+          <div class="tcard-val">${fmtFull(t.value)}</div>
+        </div>
+      </div>
+      <div class="tcard-track" onclick="toggleTcard(this.parentElement)">
+        <div class="tcard-fill" data-w="${w}" style="background:${color}"></div>
+      </div>
+      <div class="tcard-expand">
+        ${offs.length
+          ? `<div class="officer-grid">${offGrid}</div>`
+          : `<div style="font-size:14px;color:var(--t3);padding:12px 0;text-align:center">No orders for this period</div>`}
+      </div>
+    </div>`;
+  });
+
+  if(!h) h='<div class="state"><div class="icon">📭</div><div class="stitle">No data</div><div class="ssub">No orders found for this period</div></div>';
+  document.getElementById('content').innerHTML=h;
+
+  requestAnimationFrame(()=>{
+    staggerVisible('.tcard',0);
+    staggerVisible('.heat-card',0);
+    setTimeout(animateBars,200);
+    document.querySelectorAll('.tcard').forEach(card=>{
+      card.addEventListener('click',()=>{
+        if(card.classList.contains('open')){
+          staggerVisible(`#${card.id} .ofc-card`,0);
+          setTimeout(animateBars,80);
+        }
+      });
+    });
+  });
+}
+
+function toggleTcard(card){
+  card.classList.toggle('open');
+  if(card.classList.contains('open')){
+    staggerVisible(`#${card.id} .ofc-card`,0);
+    setTimeout(animateBars,80);
+  }
+}
+
+/* ── PRODUCT DRILL-DOWN ── */
+function openProdDrill(prodName){
+  if(!_currentData) return;
+  const allOff=[];
+  (_currentData.territories||[]).forEach(t=>(t.officers||[]).forEach(o=>allOff.push({...o,territory:t.name})));
+  const terrBreak={};
+  allOff.forEach(o=>{
+    (o.storeList||[]).forEach(s=>{
+      (s.orderList||[]).forEach(ord=>{
+        if(!ord.products||ord.products.indexOf('NO ORDER')===0) return;
+        ord.products.split(/[|;,]/).forEach(seg=>{
+          seg=seg.trim(); if(!seg) return;
+          const m=seg.match(/^(.+?)[×x](\d+)@/i);
+          const name=m?m[1].trim():seg;
+          if(name!==prodName) return;
+          const qty=m?parseInt(m[2]):1;
+          if(!terrBreak[o.territory]) terrBreak[o.territory]={qty:0,officers:{}};
+          terrBreak[o.territory].qty+=qty;
+          if(!terrBreak[o.territory].officers[o.name]) terrBreak[o.territory].officers[o.name]=0;
+          terrBreak[o.territory].officers[o.name]+=qty;
+        });
+      });
+    });
+  });
+  const totalQty=Object.values(terrBreak).reduce((a,t)=>a+t.qty,0);
+  let h=`<div style="font-size:14px;color:var(--t3);margin-bottom:14px">Total sold: <b style="color:var(--t1);font-size:18px">${totalQty} units</b></div>`;
+  h+='<div style="font-size:13px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Territory Breakdown</div>';
+  Object.entries(terrBreak).sort((a,b)=>b[1].qty-a[1].qty).forEach(([terr,td])=>{
+    h+=`<div style="margin-bottom:12px;background:var(--bg);border-radius:10px;padding:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:15px;font-weight:700">${esc(terr)}</span>
+        <span style="font-size:15px;font-weight:800;color:var(--blue)">${td.qty} units</span>
+      </div>
+      ${Object.entries(td.officers).sort((a,b)=>b[1]-a[1]).map(([name,qty])=>`
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2);padding:3px 0;border-bottom:1px dashed var(--border)">
+          <span>${esc(name)}</span><span style="font-weight:700">${qty} units</span>
+        </div>`).join('')}
+    </div>`;
+  });
+  if(!Object.keys(terrBreak).length) h='<div style="color:var(--t3);font-size:14px;text-align:center;padding:20px">No order detail available for this product</div>';
+  document.getElementById('prodSheetTitle').textContent=prodName;
+  document.getElementById('prodSheetBody').innerHTML=h;
+  document.getElementById('prodOverlay').classList.add('open');
+}
+
+function closeProdOverlay(e){
+  if(!e||e.target===document.getElementById('prodOverlay'))
+    document.getElementById('prodOverlay').classList.remove('open');
+}
+
+/* ── OFFICER DRAWER ── */
+let _drawerMobile='', _drawerName='', _drawerTerr='', _drawerPeriod='today';
+let _drawerFrom='', _drawerTo='';
+
+function openOfficerDrawer(name,mobile,terr){
+  _drawerName=name; _drawerMobile=mobile; _drawerTerr=terr;
+  _drawerPeriod='today';
+  document.getElementById('drawerOfficerName').textContent=name;
+  document.getElementById('drawerOfficerSub').textContent=terr||'';
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('on'));
+  document.querySelector('.dtab[data-dp="today"]').classList.add('on');
+  document.getElementById('drawerCustomRow').style.display='none';
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('officerDrawer').classList.add('open');
+  document.body.style.overflow='hidden';
+  const r=getRange('today');
+  _drawerFrom=r.from; _drawerTo=r.to;
+  fetchAndRenderDrawer(r.from,r.to,r.label);
+}
+
+function closeDrawer(){
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('officerDrawer').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function selectDrawerPeriod(el){
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  _drawerPeriod=el.dataset.dp;
+  const cr=document.getElementById('drawerCustomRow');
+  if(_drawerPeriod==='custom'){ cr.style.display='flex'; return; }
+  cr.style.display='none';
+  const r=getRange(_drawerPeriod);
+  _drawerFrom=r.from; _drawerTo=r.to;
+  fetchAndRenderDrawer(r.from,r.to,r.label);
+}
+
+function loadDrawerCustom(){
+  const from=document.getElementById('drawerFrom').value;
+  const to=document.getElementById('drawerTo').value;
+  if(!from||!to){alert('Select both dates');return;}
+  _drawerFrom=from; _drawerTo=to;
+  fetchAndRenderDrawer(from,to,from+' to '+to);
+}
+
+const DCACHE={};
+async function fetchAndRenderDrawer(from,to,label){
+  const body=document.getElementById('drawerBody');
+  const key=from+'_'+to;
+  if(DCACHE[key]){ renderDrawer(DCACHE[key],label); return; }
+  body.innerHTML='<div class="drawer-loading"><div class="drawer-spinner"></div>Loading…</div>';
+  try {
+    const rows = await fetchFromSupabase(from, to);
+    const d = buildReportFromRows(rows, from, to);
+    DCACHE[key]=d;
+    renderDrawer(d,label);
+  } catch(sbErr) {
+    // Fallback to GAS
+    fetch(GAS+'?action=getMISDetail&from='+encodeURIComponent(from)+'&to='+encodeURIComponent(to))
+      .then(r=>r.json())
+      .then(data=>{
+        const d=data.report||data;
+        if(!d||d.error){ body.innerHTML='<div class="drawer-loading">Could not load data</div>'; return; }
+        DCACHE[key]=d;
+        renderDrawer(d,label);
+      })
+      .catch(()=>{ body.innerHTML='<div class="drawer-loading">Connection error</div>'; });
+  }
+}
+
+function renderDrawer(data,periodLabel){
+  const allOff=[];
+  (data.territories||[]).forEach(t=>(t.officers||[]).forEach(o=>allOff.push({...o,territory:t.name})));
+  const off=allOff.find(o=>o.mobile&&_drawerMobile&&o.mobile===_drawerMobile)
+          ||allOff.find(o=>o.name===_drawerName);
+  const body=document.getElementById('drawerBody');
+  if(!off){
+    body.innerHTML='<div class="d-tiles"><div class="d-tile"><div class="d-tile-num">0</div><div class="d-tile-lbl">Orders</div></div><div class="d-tile"><div class="d-tile-num">₹0</div><div class="d-tile-lbl">Value</div></div></div><div class="drawer-loading" style="padding:16px">No orders for this period</div>';
+    return;
+  }
+
+  /* SKU summary */
+  const skuMap={};
+  (off.storeList||[]).forEach(s=>(s.orderList||[]).forEach(ord=>{
+    if(!ord.products||ord.products.indexOf('NO ORDER')===0) return;
+    ord.products.split(/[|;,]/).forEach(seg=>{
+      seg=seg.trim(); if(!seg) return;
+      const m=seg.match(/^(.+?)[×x](\d+)@/i);
+      const name=m?m[1].trim():seg; const qty=m?parseInt(m[2]):1;
+      if(!skuMap[name]) skuMap[name]={name,qty:0};
+      skuMap[name].qty+=qty;
+    });
+  }));
+  const skus=Object.values(skuMap).sort((a,b)=>b.qty-a.qty);
+
+  /* 7-day chart */
+  const todayIST=toIST(istNow());
+  const days=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(istNow()); d.setDate(d.getDate()-i);
+    days.push({date:toIST(d),label:['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()],count:0});
+  }
+  (off.storeList||[]).forEach(s=>(s.orderList||[]).forEach(ord=>{
+    const de=days.find(d=>d.date===ord.date);
+    if(de) de.count++;
+  }));
+  const maxC=Math.max(...days.map(d=>d.count),1);
+
+  let h='';
+
+  /* Tiles */
+  h+=`<div class="d-tiles">
+    <div class="d-tile"><div class="d-tile-num" id="dr-orders">0</div><div class="d-tile-lbl">Orders</div></div>
+    <div class="d-tile"><div class="d-tile-num" id="dr-value">₹0</div><div class="d-tile-lbl">Value</div></div>
+    <div class="d-tile"><div class="d-tile-num" id="dr-stores">0</div><div class="d-tile-lbl">Stores</div></div>
+    <div class="d-tile"><div class="d-tile-num">${off.kmToday!=null?off.kmToday+' km':'—'}</div><div class="d-tile-lbl">KM Today</div></div>
+  </div>`;
+
+  /* 7-day chart */
+  h+=`<div class="mini-chart">
+    <div class="mini-chart-title">Orders — last 7 days</div>
+    <div class="mini-bars">
+      ${days.map(d=>`<div class="mini-bar-wrap">
+        <div class="mini-bar${d.date===todayIST?' today':''}" style="height:${Math.max(Math.round(d.count/maxC*100),4)}%"></div>
+        <div class="mini-bar-lbl">${d.label}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+
+  /* SKU summary */
+  if(skus.length){
+    h+=`<div class="d-slabel">SKU Summary</div>
+    <div style="background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:4px">
+      ${skus.map(s=>`<div class="d-sku-row">
+        <span class="d-sku-name">${esc(s.name)}</span>
+        <span class="d-sku-qty">${s.qty} units</span>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  /* Stores & orders with full drill-down */
+  if((off.storeList||[]).length){
+    h+=`<div class="d-slabel">Stores & Orders</div>`;
+    off.storeList.forEach((s,si)=>{
+      const storeSkuMap={};
+      let hasStock=false,stockLines='',hasDamaged=false,damagedLines='';
+      (s.orderList||[]).forEach(ord=>{
+        if(ord.products&&ord.products.indexOf('NO ORDER')!==0){
+          ord.products.split(/[|;,]/).forEach(seg=>{
+            seg=seg.trim(); if(!seg) return;
+            const m=seg.match(/^(.+?)[×x](\d+)@/i);
+            const name=m?m[1].trim():seg; const qty=m?parseInt(m[2]):1;
+            if(!storeSkuMap[name]) storeSkuMap[name]={name,qty:0};
+            storeSkuMap[name].qty+=qty;
+          });
+        }
+        if(ord.auditSummary&&ord.auditSummary.trim()){
+          hasStock=true;
+          ord.auditSummary.split(/[|;,]/).forEach(seg=>{
+            seg=seg.trim(); if(!seg) return;
+            stockLines+=`<div class="d-sku-row"><span class="d-sku-name">${esc(seg)}</span></div>`;
+          });
+        }
+        if(ord.unsaleableSummary&&ord.unsaleableSummary.trim()){
+          hasDamaged=true;
+          ord.unsaleableSummary.split(/[|;,]/).forEach(seg=>{
+            seg=seg.trim(); if(!seg) return;
+            damagedLines+=`<div class="d-sku-row"><span class="d-sku-name" style="color:var(--red)">${esc(seg)}</span></div>`;
+          });
+        }
+      });
+      const storeSkus=Object.values(storeSkuMap).sort((a,b)=>b.qty-a.qty);
+      const itemsH=storeSkus.length
+        ? storeSkus.map(sk=>`<div class="d-sku-row"><span class="d-sku-name">${esc(sk.name)}</span><span class="d-sku-qty">${sk.qty}</span></div>`).join('')
+        : '<div style="font-size:13px;color:var(--t3);padding:6px 0">No item detail</div>';
+
+      /* Map link from first order with coords */
+      const firstWithMap=(s.orderList||[]).find(o=>o.lat&&o.lng||o.mapLink);
+      const mapH=firstWithMap
+        ? `<a class="d-maps-link" href="${firstWithMap.mapLink||'https://maps.google.com/?q='+firstWithMap.lat+','+firstWithMap.lng}" target="_blank">📍 View on Maps</a>`
+        : '';
+
+      const stockH=hasStock
+        ? `<div class="d-section-toggle" onclick="this.classList.toggle('open')">
+            <span>📦 Closing Stock</span><span class="d-section-chev">▾</span>
+          </div><div class="d-section-body">${stockLines}</div>`
+        : '';
+
+      const damagedH=hasDamaged
+        ? `<div class="d-section-toggle" onclick="this.classList.toggle('open')">
+            <span>⚠️ Damaged / Unsaleable</span><span class="d-section-chev">▾</span>
+          </div><div class="d-section-body">${damagedLines}</div>`
+        : '';
+
+      h+=`<div class="d-store-card" id="dsc${si}">
+        <div class="d-store-head" onclick="this.parentElement.classList.toggle('open')">
+          <div>
+            <div class="d-store-name">${esc(s.name)}</div>
+            <div class="d-store-meta">${s.orders} order(s)${s.city?' · '+esc(s.city):''}${s.distributor?' · '+esc(s.distributor):''}</div>
+          </div>
+          <div class="d-store-val">${fmtFull(s.value)}</div>
+        </div>
+        <div class="d-store-body">
+          ${itemsH}${stockH}${damagedH}${mapH}
+        </div>
+      </div>`;
+    });
+  }
+
+  body.innerHTML=h;
+  setTimeout(()=>{
+    countUp(document.getElementById('dr-orders'),off.orders||0,'','',600);
+    countUp(document.getElementById('dr-value'),off.value||0,'₹','',700);
+    countUp(document.getElementById('dr-stores'),off.stores||0,'','',600);
+  },50);
+}
+
+/* ── ERROR / LOAD ── */
+function showError(title,sub){
+  document.getElementById('tiles').innerHTML='';
+  document.getElementById('content').innerHTML=`<div class="state"><div class="icon">⚠️</div><div class="stitle">${esc(title)}</div><div class="ssub">${esc(sub||'')}</div></div>`;
+}
+
+let _lastFrom='',_lastTo='',_lastLabel='';
+
+async function loadRange(from,to,label){
+  _lastFrom=from; _lastTo=to; _lastLabel=label;
+  document.getElementById('genAt').textContent = new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'long',timeZone:'Asia/Kolkata'}) + ' · ' + new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('hero-num').textContent='0';
+  document.getElementById('hm-orders').textContent='—';
+  document.getElementById('hm-stores').textContent='—';
+  document.getElementById('hm-officers').textContent='—';
+  document.getElementById('tiles').innerHTML=`<div class="skel skel-tile"></div><div class="skel skel-tile"></div><div class="skel skel-tile"></div>`;
+  document.getElementById('content').innerHTML=`<div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-bar" style="width:70%;margin-top:16px"></div><div class="skel skel-bar" style="width:50%"></div>`;
+  try {
+    // ── Primary: Supabase (instant) ──
+    const rows = await fetchFromSupabase(from, to);
+    const d = buildReportFromRows(rows, from, to);
+    renderTiles(d.totals||{});
+    renderContent(d);
+  } catch(sbErr) {
+    // ── Fallback: GAS ──
+    console.warn('Supabase failed, falling back to GAS:', sbErr);
+    fetch(GAS+'?action=getMISDetail&from='+encodeURIComponent(from)+'&to='+encodeURIComponent(to))
+      .then(r=>r.json())
+      .then(data=>{
+        const d=data.report||data;
+        if(!d||d.error){showError('Could not load report',d&&d.error?d.error:'Server error');return;}
+        renderTiles(d.totals||{});
+        renderContent(d);
+      })
+      .catch(()=>showError('Connection error','Could not reach server. Check internet.'));
+  }
+}
+
+function loadPeriod(p){ const r=getRange(p); loadRange(r.from,r.to,r.label); }
+function loadCustom(){
+  const from=document.getElementById('fromDate').value;
+  const to=document.getElementById('toDate').value;
+  if(!from||!to){alert('Select both dates');return;}
+  if(from>to){alert('From must be before To');return;}
+  loadRange(from,to,from+' to '+to);
+}
+function reloadCurrent(){
+  if(_lastFrom) loadRange(_lastFrom,_lastTo,_lastLabel);
+  else loadPeriod('today');
+}
+
+/* ── TABS ── */
+document.getElementById('tabs').addEventListener('click',function(e){
+  const t=e.target.closest('.tab'); if(!t) return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');
+  const p=t.dataset.p;
+  const cr=document.getElementById('customRow');
+  if(p==='custom'){cr.classList.toggle('show');return;}
+  cr.classList.remove('show');
+  loadPeriod(p);
+});
+
+/* ── BOOT ── */
+const today=toIST(istNow());
+document.getElementById('fromDate').value=today;
+document.getElementById('toDate').value=today;
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+const todayTab=document.querySelector('.tab[data-p="today"]');
+if(todayTab) todayTab.classList.add('on');
+
+const _urlParams=new URLSearchParams(window.location.search);
+const _openTerritory=_urlParams.get('territory')||'';
+loadPeriod('today');
+
+if(_openTerritory){
+  const _wait=setInterval(()=>{
+    const els=document.querySelectorAll('.tcard');
+    if(!els.length) return;
+    clearInterval(_wait);
+    els.forEach(el=>{
+      const nm=el.querySelector('.tcard-name');
+      if(nm&&nm.textContent.trim().startsWith(_openTerritory)){
+        el.classList.add('open');
+        staggerVisible(`#${el.id} .ofc-card`,0);
+        setTimeout(()=>{try{el.scrollIntoView({behavior:'smooth',block:'start'})}catch(e){}},150);
+      }
+    });
+  },300);
+  setTimeout(()=>clearInterval(_wait),8000);
+}
+</script>
+</body>
+</html>

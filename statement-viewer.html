@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diabliss Statement</title>
+<style>
+  body { margin: 0; font-family: Arial, sans-serif; background: #f0f0f0; }
+  #toolbar { background: #0A6FA3; color: #fff; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  #toolbar .title { font-size: 14px; font-weight: 600; flex: 1; text-align: center; }
+  #content { background: #fff; padding: 16px; min-height: 100vh; }
+  #empty { text-align: center; padding: 60px 20px; color: #888; font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="toolbar">
+  <div class="title" id="stmt-title">Diabliss Statement</div>
+</div>
+<div id="content">
+  <div id="empty" style="display:none">
+    <p>Statement not found.</p>
+    <p style="font-size:12px">Please go back to the app and tap Share Statement again.</p>
+  </div>
+</div>
+<script>
+  try {
+    const html = sessionStorage.getItem('_stmt_html');
+    const title = sessionStorage.getItem('_stmt_title') || 'Diabliss Statement';
+    document.getElementById('stmt-title').textContent = title.replace(/_/g, ' ');
+    document.title = title.replace(/_/g, ' ');
+    if (html) {
+      document.getElementById('content').innerHTML = html;
+    } else {
+      document.getElementById('empty').style.display = 'block';
+    }
+  } catch(e) {
+    document.getElementById('empty').style.display = 'block';
+  }
+</script>
+</body>
+</html>

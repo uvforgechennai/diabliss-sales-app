@@ -2011,8 +2011,6 @@
   const API_TOKEN = ''; // ← FILL IN YOUR SECRET TOKEN HERE
 </script>
 <script src="version.js"></script>
-<script src="pricing.js"></script>
-<script src="app-core.js"></script>
 <script>
 // pdf.js is only needed if a feature ever needs to read/render an existing PDF.
 // Loaded on demand (not on every app launch) — call and await ensurePdfJs()
@@ -2034,17 +2032,14 @@ function ensurePdfJs(){
   return _pdfJsLoading;
 }
 </script>
-<script src="app-ui-helpers.js"></script>
-<script src="app-visit-flow.js"></script>
-<script src="app-admin-master.js"></script>
-<script src="app-dash-reports.js"></script>
-<script src="app-corrections.js"></script>
-<script src="app-targets-expenses.js"></script>
-<script src="app-ledger-invoice.js"></script>
-<script src="app-data-sync.js"></script>
-<script src="app-features-new.js"></script>
-<script src="app-features-v2.js"></script>
-<script src="app-chatbot.js"></script>
+<!-- app-bundle.js is generated at deploy time by build.js, concatenating
+     (in this exact order) pricing.js, app-core.js, app-ui-helpers.js,
+     app-visit-flow.js, app-admin-master.js, app-dash-reports.js,
+     app-corrections.js, app-targets-expenses.js, app-ledger-invoice.js,
+     app-data-sync.js, app-features-new.js, app-features-v2.js,
+     app-chatbot.js — one request instead of thirteen. Edit those source
+     files individually; never edit app-bundle.js directly. -->
+<script src="app-bundle.js"></script>
 <script>
   // Init: run after all modules are loaded
   (function(){

@@ -1,0 +1,21 @@
+# Make sure a new deploy reaches phones quickly instead of sitting behind
+# stale browser/service-worker caches for hours.
+
+<IfModule mod_headers.c>
+  # The service worker script must always be revalidated — this is what
+  # controls how fast phones notice a new deploy exists at all.
+  <FilesMatch "^sw\.js$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  # App shell + JS/CSS: always revalidate so an update is picked up on the
+  # next visit instead of waiting out a long cache lifetime.
+  <FilesMatch "\.(html|js|json|css)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  # Images change rarely — safe to cache longer.
+  <FilesMatch "\.(png|jpg|jpeg|webp|svg|ico)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>

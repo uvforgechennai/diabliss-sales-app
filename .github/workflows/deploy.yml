@@ -12,9 +12,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build JS bundle
-        run: node build.js
-
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -27,17 +24,3 @@ jobs:
             **/.git*/**
             .github/**
             README.md
-            build.js
-            pricing.js
-            app-core.js
-            app-ui-helpers.js
-            app-visit-flow.js
-            app-admin-master.js
-            app-dash-reports.js
-            app-corrections.js
-            app-targets-expenses.js
-            app-ledger-invoice.js
-            app-data-sync.js
-            app-features-new.js
-            app-features-v2.js
-            app-chatbot.js

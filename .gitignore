@@ -1,4 +1,0 @@
-# Build artifact — generated fresh by build.js in CI before every deploy.
-# Never edit or commit this directly; edit the individual app-*.js source
-# files instead.
-app-bundle.js

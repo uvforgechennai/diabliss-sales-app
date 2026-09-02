@@ -24,3 +24,10 @@ jobs:
             **/.git*/**
             .github/**
             README.md
+
+      - name: Broadcast force-refresh to installed apps
+        run: |
+          curl -sS -X POST 'https://script.google.com/macros/s/AKfycbzznExu7LAHKDdsTuSIWr4wSAwCojqpDeKKwbCTZBO3Al-Zci244jva788dTFWz74Hf/exec' \
+            -H 'Content-Type: text/plain' \
+            -d '{"action":"sendForceRefresh","broadcast":true}' \
+            || true

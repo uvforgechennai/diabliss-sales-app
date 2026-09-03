@@ -248,7 +248,7 @@ Rules:
 - Return ONLY a JSON array, no markdown, no explanation: [{"name":"exact product name","qty":number}]`;
   try {
     if (!SCRIPT_URL) throw new Error('No GAS URL');
-    const res = await fetch(SCRIPT_URL, {method:'POST', body:gasPayload({action:'handleChatbot',prompt:prompt}), signal: AbortSignal.timeout(15000)});
+    const res = await fetch(SCRIPT_URL, {method:'POST', body:gasPayload({action:'handleChatbot',prompt:prompt}), signal: _timeoutSignal(15000)});
     const data = await res.json();
     let text = (data.result || '').replace(/```json|```/g, '').trim();
     const match = text.match(/\[[\s\S]*\]/);
@@ -329,7 +329,7 @@ function handlePOUpload(event) {
           store: store,
           token: typeof API_TOKEN !== 'undefined' ? API_TOKEN : ''
         }),
-        signal: AbortSignal.timeout(30000)
+        signal: _timeoutSignal(30000)
       });
       const data = await res.json();
       const items = data.items || [];

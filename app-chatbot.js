@@ -176,7 +176,7 @@ async function dbSendToGroq(text) {
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
       body: gasPayload({ action: 'handleChatbot', prompt: _fullPrompt }),
-      signal: AbortSignal.timeout(35000)
+      signal: _timeoutSignal(35000)
     });
     const data = await res.json();
     const reply = (data && (data.result || (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content))) || '';

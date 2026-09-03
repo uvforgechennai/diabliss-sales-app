@@ -56,13 +56,26 @@ async function fetchAndCacheOrders(){
     try{
       const territory=typeof getMyTerritory==='function'?getMyTerritory():(CU?.territory||'');
       let normalized=null;
-      try{
-        const rows=await _fetchOrdersFromSupabase();
+      // Retry each source once (1s backoff) before falling through — a single
+      // transient timeout used to mean a silent zero on the dashboard with no
+      // error shown, since callers just render whatever's already cached.
+      let rows=null;
+      for(let i=0;i<2&&!rows;i++){
+        try{rows=await _fetchOrdersFromSupabase();}
+        catch(e){if(i===0)await new Promise(res=>setTimeout(res,1000));}
+      }
+      if(rows){
         normalized=territory&&territory!=='All'?rows.filter(o=>!o.territory||o.territory===territory):rows;
-      }catch(e){
+      }else{
         if(!SCRIPT_URL)return;
-        const r=await fetch(gasGetUrl(SCRIPT_URL+'?action=getOrders&territory='+encodeURIComponent(territory)),{signal:AbortSignal.timeout(15000)});
-        const data=await r.json();
+        let data=null;
+        for(let i=0;i<2&&!data;i++){
+          try{
+            const r=await fetch(gasGetUrl(SCRIPT_URL+'?action=getOrders&territory='+encodeURIComponent(territory)),{signal:AbortSignal.timeout(15000)});
+            data=await r.json();
+          }catch(e){if(i===0)await new Promise(res=>setTimeout(res,1000));}
+        }
+        if(!data)return;
         normalized=(data?.orders||[]).map(o=>({...o,grand:(o.grand??o.total??0),items:o.items||[]}));
       }
       if(!normalized||!normalized.length)return;

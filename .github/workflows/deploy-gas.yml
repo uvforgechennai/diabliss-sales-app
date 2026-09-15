@@ -1,0 +1,38 @@
+name: Deploy Orders GAS Backend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'orders/gas/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install clasp
+        run: npm install -g @google/clasp
+
+      - name: Write clasp credentials
+        run: echo '${{ secrets.CLASP_CREDENTIALS }}' > ~/.clasprc.json
+
+      - name: Push source to Apps Script
+        working-directory: orders/gas
+        run: clasp push --force
+
+      - name: Deploy new version to existing Web App
+        working-directory: orders/gas
+        run: |
+          clasp deploy \
+            --deploymentId "${{ vars.GAS_DEPLOYMENT_ID }}" \
+            --description "Auto-deploy from GitHub Actions ($(date -u +%Y-%m-%dT%H:%M:%SZ)) — ${{ github.sha }}"

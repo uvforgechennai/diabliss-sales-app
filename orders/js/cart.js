@@ -1,6 +1,7 @@
 const Cart = (function () {
   const qtyById = {};
   const flatProducts = {};
+  let outOfStockIds = new Set();
 
   PRODUCT_CATALOG.forEach(function (category) {
     category.products.forEach(function (product) {
@@ -20,6 +21,7 @@ const Cart = (function () {
 
   function setQty(id, qty) {
     if (!(id in flatProducts)) return;
+    if (outOfStockIds.has(id) && qty > getQty(id)) return;
     const clamped = Math.max(0, Math.min(999, Math.floor(qty) || 0));
     qtyById[id] = clamped;
     render();
@@ -229,6 +231,28 @@ const Cart = (function () {
     }
   }
 
+  function applyStockStatus() {
+    outOfStockIds.forEach(function (id) {
+      if (!(id in flatProducts)) return;
+      const card = document.getElementById('card-' + id);
+      const control = document.getElementById('qty-control-' + id);
+      if (card) card.classList.add('out-of-stock');
+      if (control) control.innerHTML = '<span class="out-of-stock-label">Out of Stock</span>';
+    });
+  }
+
+  function fetchStockStatus() {
+    fetch(CONFIG.GAS_URL, { method: 'GET' })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data && Array.isArray(data.outOfStock)) {
+          outOfStockIds = new Set(data.outOfStock);
+          applyStockStatus();
+        }
+      })
+      .catch(function () { /* fail open: treat everything as in stock */ });
+  }
+
   function initSummaryToggle() {
     const panel = document.getElementById('summary-panel');
     const toggle = document.getElementById('summary-toggle');
@@ -260,6 +284,7 @@ const Cart = (function () {
     initCategoryNavScroll();
     initSummaryToggle();
     render();
+    fetchStockStatus();
 
     const form = document.getElementById('order-form');
     form.addEventListener('input', renderSummary);

@@ -16,6 +16,85 @@ const HEADERS = [
   'Products', 'MRP Total', 'Discount%', 'Discount Amount', 'Final Amount', 'Razorpay Payment ID', 'Status'
 ];
 
+const STOCK_SHEET_NAME = 'Stock Status';
+const STOCK_HEADERS = ['Product ID', 'Product Name', 'In Stock'];
+
+// Keep this list in sync with the product IDs/names in js/products.js.
+// Used only to pre-fill the Stock Status sheet the first time it's created.
+const PRODUCT_REFERENCE = [
+  { id: 'sugar-40x5g', name: 'Sugar 40x5g Sachet Box' },
+  { id: 'sugar-500g', name: 'Sugar 500g Standy Pouch' },
+  { id: 'sugar-1kg', name: 'Sugar 1kg PET Jar' },
+  { id: 'sugar-1.75kg', name: 'Sugar 1.75kg PET Jar' },
+  { id: 'sugar-5kg', name: 'Sugar 5kg' },
+  { id: 'sugar-10kg', name: 'Sugar 10kg' },
+  { id: 'jaggery-500g', name: 'Jaggery 500g Standy Pouch' },
+  { id: 'jaggery-750g', name: 'Jaggery 750g PET Jar' },
+  { id: 'jaggery-1.25kg', name: 'Jaggery 1.25kg PET Jar' },
+  { id: 'jaggery-5kg', name: 'Jaggery 5kg Bag' },
+  { id: 'tea-lemon-10x10g', name: 'Lemon Tea 10x10g' },
+  { id: 'tea-lemon-30x10g', name: 'Lemon Tea 30x10g' },
+  { id: 'tea-lemon-500g', name: 'Lemon Tea 500g' },
+  { id: 'tea-combo-30x10g', name: 'Combo Tea 30x10g' },
+  { id: 'tea-ginger-10x10g', name: 'Ginger Tea 10x10g' },
+  { id: 'tea-masala-10x10g', name: 'Masala Chai 10x10g' },
+  { id: 'cookies-millets-120g', name: 'Millets Cookies 120g' },
+  { id: 'cookies-moringa-120g', name: 'Millets with Moringa Leaves Cookies 120g' },
+  { id: 'cookies-chia-120g', name: 'Millets with Chia Seeds Cookies 120g' },
+  { id: 'jam-mixed-fruit-225g', name: 'Mixed Fruit Jam 225g' },
+  { id: 'jam-guava-225g', name: 'Guava Jam 225g' },
+  { id: 'jam-pineapple-ginger-225g', name: 'Pineapple Ginger Jam 225g' },
+  { id: 'halwa-moong-dhal-225g', name: 'Moong Dhal Halwa 225g' },
+  { id: 'halwa-whole-wheat-225g', name: 'Whole Wheat Halwa 225g' },
+  { id: 'kheer-basmati-rice-225g', name: 'Basmati Rice Kheer 225g' },
+  { id: 'kheer-vermicilli-225g', name: 'Vermicilli Kheer 225g' },
+  { id: 'hw-glucose', name: 'Herbal Water - Blood Glucose Support' },
+  { id: 'hw-bp', name: 'Herbal Water - BP Support' },
+  { id: 'hw-hair', name: 'Herbal Water - Hair Care' },
+  { id: 'hw-skin', name: 'Herbal Water - Skin Care' },
+  { id: 'hw-immunity', name: 'Herbal Water - Immunity' }
+];
+
+function doGet(e) {
+  try {
+    return jsonResponse_({ status: 'ok', outOfStock: getOutOfStockIds_() });
+  } catch (err) {
+    Logger.log('doGet error: ' + err);
+    return jsonResponse_({ status: 'error', message: String(err), outOfStock: [] });
+  }
+}
+
+function getOutOfStockIds_() {
+  const sheet = getOrCreateStockSheet_();
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return [];
+
+  const data = sheet.getRange(2, 1, lastRow - 1, 3).getValues();
+  const outOfStock = [];
+  data.forEach(function (row) {
+    const id = row[0];
+    const inStock = row[2];
+    if (id && inStock === false) {
+      outOfStock.push(id);
+    }
+  });
+  return outOfStock;
+}
+
+function getOrCreateStockSheet_() {
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  let sheet = ss.getSheetByName(STOCK_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(STOCK_SHEET_NAME);
+    sheet.appendRow(STOCK_HEADERS);
+    const rows = PRODUCT_REFERENCE.map(function (p) { return [p.id, p.name, true]; });
+    sheet.getRange(2, 1, rows.length, 3).setValues(rows);
+    sheet.getRange(2, 3, rows.length, 1).insertCheckboxes();
+    sheet.autoResizeColumns(1, 2);
+  }
+  return sheet;
+}
+
 function doPost(e) {
   try {
     const order = JSON.parse(e.postData.contents);

@@ -23,8 +23,15 @@ orders/
 │   ├── cart.js            Cart state, totals, rendering
 │   └── payment.js         Razorpay checkout + order submission
 ├── images/                Product images (extracted from catalog PDF)
-└── gas/Code.gs             Google Apps Script backend (deploy separately)
+└── gas/
+    ├── Code.gs             Google Apps Script backend
+    ├── appsscript.json     GAS project manifest (clasp)
+    ├── .clasp.json         Links this folder to your Apps Script project
+    └── .claspignore        Limits what clasp pushes to Apps Script
 ```
+
+GAS deploys are automated via `.github/workflows/deploy-gas.yml` (clasp +
+GitHub Actions) — see Step 2 below for the one-time setup.
 
 ## One-time setup
 
@@ -39,18 +46,50 @@ orders/
 
 ### 2. Deploy the GAS backend
 
-1. Go to [script.google.com](https://script.google.com) and create a new project.
-2. Delete the default `Code.gs` content and paste in the contents of
-   [`gas/Code.gs`](gas/Code.gs) from this repo.
-3. At the top of the script, fill in the `CONFIG` object:
-   - `SHEET_ID`: the Sheet ID from step 1.
-   - `CALLMEBOT_APIKEY`: see step 4 below.
-4. Click **Deploy → New deployment**.
-   - Type: **Web app**
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-5. Click **Deploy**, authorize the requested permissions, and copy the
-   **Web App URL** it gives you (ends in `/exec`).
+The GAS backend deploys automatically via **clasp + GitHub Actions** on every
+push to `main` that touches `orders/gas/**` — same pattern as your other
+`clasp`-based projects. `orders/gas/` already contains `appsscript.json`
+(the manifest), `.clasp.json` (project link), `.claspignore`, and the
+workflow lives at `.github/workflows/deploy-gas.yml`.
+
+**One-time setup** (only needed once, ever — after this, every future change
+to `Code.gs` just deploys itself on push):
+
+1. Go to [script.google.com](https://script.google.com) and create a new
+   project (name it e.g. "Diabliss Orders Backend"), or reuse one you
+   already created manually.
+2. Open **Project Settings** (gear icon) in that project and copy the
+   **Script ID**. Paste it into `orders/gas/.clasp.json`, replacing
+   `TO_BE_FILLED`:
+   ```json
+   { "scriptId": "YOUR_SCRIPT_ID", "rootDir": "." }
+   ```
+3. If the project doesn't already have a Web App deployment, create the
+   first one manually (only ever needed once): **Deploy → New deployment**
+   → type **Web app** → Execute as **Me** → Who has access **Anyone** →
+   **Deploy**. Copy the **Web App URL** (`/exec`) for Step 3 below, and the
+   **Deployment ID** shown next to it (also visible any time under
+   **Deploy → Manage deployments**).
+4. On your local machine (wherever you already run `clasp login` for your
+   other projects), run `clasp login` if you haven't for this Google
+   account, then get its credentials file:
+   ```bash
+   cat ~/.clasprc.json
+   ```
+5. In this GitHub repo, go to **Settings → Secrets and variables →
+   Actions** and add:
+   - A **Secret** named `CLASP_CREDENTIALS` — paste the entire contents of
+     `~/.clasprc.json` from step 4.
+   - A **Variable** named `GAS_DEPLOYMENT_ID` — the Deployment ID from
+     step 3 (not the Script ID). This makes every future deploy update the
+     *same* live Web App URL instead of minting a new one.
+6. At the top of `gas/Code.gs`, fill in the `CONFIG` object (`SHEET_ID` from
+   Step 1, `CALLMEBOT_APIKEY` from Step 4 below), commit, and push to
+   `main` — the workflow pushes the code to Apps Script and redeploys the
+   existing Web App automatically.
+
+From then on, editing `gas/Code.gs` and pushing to `main` is the entire
+deploy process — no manual copy-pasting into the Apps Script editor again.
 
 ### 3. Update `GAS_URL` in `js/config.js`
 
@@ -76,9 +115,9 @@ Commit and push this change so it goes live.
 2. Send that contact a WhatsApp message saying exactly:
    `I allow callmebot to send me messages`
 3. CallMeBot will reply with your personal API key.
-4. Paste that key into `CALLMEBOT_APIKEY` in `gas/Code.gs` (in the Apps
-   Script editor) and re-deploy (**Deploy → Manage deployments → Edit →
-   New version → Deploy**).
+4. Paste that key into `CALLMEBOT_APIKEY` in `orders/gas/Code.gs`, commit,
+   and push to `main` — the GAS deploy workflow picks it up automatically
+   (see Step 2's one-time clasp setup if you haven't done that yet).
 
 ### 5. Connect this GitHub repo to Hostinger for auto-deploy
 
@@ -125,10 +164,9 @@ time someone loads the page; an unchecked item shows a grayed-out
 cart. If the site can't reach the sheet for any reason, it fails open
 (treats everything as in stock) rather than blocking orders.
 
-This does require the one-time GAS redeploy described in Step 2 if you set
-up the backend before this feature existed — in the Apps Script editor,
-replace the code with the latest `gas/Code.gs` from this repo, then
-**Deploy → Manage deployments → Edit → New version → Deploy**.
+This does require the one-time clasp CI setup described in Step 2 if you
+haven't done that yet — once it's in place, this feature (and any future
+`Code.gs` change) deploys automatically on push.
 
 ## Discount logic
 

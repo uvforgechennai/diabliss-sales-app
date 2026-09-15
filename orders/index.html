@@ -9,11 +9,20 @@
 <body>
 
 <header class="site-header">
-  <div class="brand">
-    <span class="brand-name">DIABLISS</span>
-    <span class="brand-tagline">Low Glycemic Index Foods</span>
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-name">DIABLISS</span>
+      <span class="brand-tagline">Low Glycemic Index Foods</span>
+    </div>
+  </div>
+  <div class="trust-bar">
+    <span>🚚 Free Shipping</span>
+    <span>🩺 Low GI Certified</span>
+    <span>🔒 Secure Payments</span>
   </div>
 </header>
+
+<nav class="category-nav" id="category-nav" aria-label="Jump to category"></nav>
 
 <main class="page">
 
@@ -21,8 +30,13 @@
 
     <div class="main-col">
 
+      <section class="catalog" id="catalog">
+        <h2><span class="step-badge">1</span> Choose Your Products</h2>
+        <div id="catalog-container"></div>
+      </section>
+
       <section class="order-form" id="order-form">
-        <h2>Delivery Details</h2>
+        <h2><span class="step-badge">2</span> Delivery Details</h2>
 
         <div class="form-grid">
           <div class="form-field">
@@ -100,15 +114,18 @@
         </div>
       </section>
 
-      <section class="catalog" id="catalog">
-        <h2>Our Products</h2>
-        <div id="catalog-container"></div>
-      </section>
-
     </div>
 
     <aside class="summary-panel" id="summary-panel">
-      <div class="summary-inner">
+      <button type="button" class="summary-toggle" id="summary-toggle" aria-expanded="false">
+        <span class="summary-toggle-info">
+          <span class="summary-toggle-count" id="toggle-item-count">0 items</span>
+          <span class="summary-toggle-amount" id="toggle-final-amount">₹0</span>
+        </span>
+        <span class="summary-toggle-icon" aria-hidden="true">▲</span>
+      </button>
+
+      <div class="summary-body" id="summary-body">
         <h3 class="summary-title">Order Summary</h3>
         <div class="summary-items" id="summary-items">
           <p class="summary-empty">No items added yet</p>
@@ -132,6 +149,7 @@
           </div>
         </div>
         <button type="button" id="proceed-btn" class="proceed-btn" disabled>Proceed to Pay</button>
+        <p class="proceed-hint" id="proceed-hint"></p>
         <p class="payment-error" id="payment-error" hidden></p>
       </div>
     </aside>

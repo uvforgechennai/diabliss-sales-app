@@ -91,6 +91,12 @@ const Cart = (function () {
     return true;
   }
 
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
   function renderSummary() {
     const totals = computeTotals();
 
@@ -118,36 +124,58 @@ const Cart = (function () {
       discountRow.hidden = true;
     }
 
+    const itemCount = totals.items.reduce(function (sum, item) { return sum + item.qty; }, 0);
+    document.getElementById('toggle-item-count').textContent = itemCount + (itemCount === 1 ? ' item' : ' items');
+    document.getElementById('toggle-final-amount').textContent = formatRupees(totals.finalAmount);
+
     const hasItems = totals.items.length > 0;
+    const formValid = isFormValid();
     const proceedBtn = document.getElementById('proceed-btn');
-    proceedBtn.disabled = !(hasItems && isFormValid());
+    proceedBtn.disabled = !(hasItems && formValid);
+
+    const hint = document.getElementById('proceed-hint');
+    if (!hasItems) {
+      hint.textContent = 'Add at least one product to continue';
+      hint.hidden = false;
+    } else if (!formValid) {
+      hint.textContent = 'Please complete your delivery details below';
+      hint.hidden = false;
+    } else {
+      hint.textContent = '';
+      hint.hidden = true;
+    }
 
     return totals;
   }
 
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+  function renderCategoryNav() {
+    const nav = document.getElementById('category-nav');
+    nav.innerHTML = PRODUCT_CATALOG.map(function (category) {
+      return '<a href="#category-' + category.id + '" class="category-pill" data-target="category-' + category.id + '">' +
+        escapeHtml(category.name) + '</a>';
+    }).join('');
   }
 
   function renderCatalog() {
     const container = document.getElementById('catalog-container');
     container.innerHTML = PRODUCT_CATALOG.map(function (category) {
-      const productsHtml = category.products.map(function (product) {
+      const cardsHtml = category.products.map(function (product) {
         const img = product.image
-          ? '<img class="product-thumb" src="' + product.image + '" alt="' + escapeHtml(product.name) + '" loading="lazy">'
+          ? '<img class="product-card-image" src="' + product.image + '" alt="' + escapeHtml(product.name) + '" loading="lazy">'
           : '';
-        return '<div class="product-row" data-product-id="' + product.id + '">' +
+        return '<div class="product-card" id="card-' + product.id + '">' +
           img +
-          '<div class="product-info">' +
-            '<span class="product-name">' + escapeHtml(product.name) + '</span>' +
-            '<span class="product-mrp">₹' + product.mrp + '</span>' +
+          '<div class="product-card-body">' +
+            '<span class="product-card-name">' + escapeHtml(product.name) + '</span>' +
+            '<span class="product-card-mrp">₹' + product.mrp + '</span>' +
           '</div>' +
-          '<div class="stepper">' +
-            '<button type="button" class="stepper-btn stepper-minus" data-action="minus" data-id="' + product.id + '" aria-label="Decrease quantity">−</button>' +
-            '<span class="stepper-qty" id="qty-' + product.id + '">0</span>' +
-            '<button type="button" class="stepper-btn stepper-plus" data-action="plus" data-id="' + product.id + '" aria-label="Increase quantity">+</button>' +
+          '<div class="qty-control" id="qty-control-' + product.id + '">' +
+            '<button type="button" class="add-btn" data-action="plus" data-id="' + product.id + '">+ Add</button>' +
+            '<div class="stepper">' +
+              '<button type="button" class="stepper-btn stepper-minus" data-action="minus" data-id="' + product.id + '" aria-label="Decrease quantity">−</button>' +
+              '<span class="stepper-qty" id="qty-' + product.id + '">0</span>' +
+              '<button type="button" class="stepper-btn stepper-plus" data-action="plus" data-id="' + product.id + '" aria-label="Increase quantity">+</button>' +
+            '</div>' +
           '</div>' +
         '</div>';
       }).join('');
@@ -159,12 +187,12 @@ const Cart = (function () {
       return '<div class="category-section" id="category-' + category.id + '">' +
         categoryImg +
         '<h3 class="category-title">' + escapeHtml(category.name) + (category.subtitle ? ' <span class="category-subtitle">(' + escapeHtml(category.subtitle) + ')</span>' : '') + '</h3>' +
-        '<div class="product-list">' + productsHtml + '</div>' +
+        '<div class="product-grid">' + cardsHtml + '</div>' +
       '</div>';
     }).join('');
 
     container.addEventListener('click', function (event) {
-      const btn = event.target.closest('.stepper-btn');
+      const btn = event.target.closest('.stepper-btn, .add-btn');
       if (!btn) return;
       const id = btn.getAttribute('data-id');
       const delta = btn.getAttribute('data-action') === 'plus' ? 1 : -1;
@@ -172,18 +200,65 @@ const Cart = (function () {
     });
   }
 
+  function initCategoryNavScroll() {
+    const nav = document.getElementById('category-nav');
+    nav.addEventListener('click', function (event) {
+      const pill = event.target.closest('.category-pill');
+      if (!pill) return;
+      event.preventDefault();
+      const target = document.getElementById(pill.getAttribute('data-target'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    const sections = PRODUCT_CATALOG.map(function (category) {
+      return document.getElementById('category-' + category.id);
+    }).filter(Boolean);
+
+    if ('IntersectionObserver' in window && sections.length) {
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          const pills = nav.querySelectorAll('.category-pill');
+          pills.forEach(function (pill) {
+            pill.classList.toggle('active', pill.getAttribute('data-target') === entry.target.id);
+          });
+        });
+      }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+
+      sections.forEach(function (section) { observer.observe(section); });
+    }
+  }
+
+  function initSummaryToggle() {
+    const panel = document.getElementById('summary-panel');
+    const toggle = document.getElementById('summary-toggle');
+    toggle.addEventListener('click', function () {
+      const expanded = panel.classList.toggle('expanded');
+      toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      toggle.querySelector('.summary-toggle-icon').textContent = expanded ? '▼' : '▲';
+    });
+  }
+
   function render() {
     PRODUCT_CATALOG.forEach(function (category) {
       category.products.forEach(function (product) {
-        const el = document.getElementById('qty-' + product.id);
-        if (el) el.textContent = getQty(product.id);
+        const qty = getQty(product.id);
+        const qtyEl = document.getElementById('qty-' + product.id);
+        if (qtyEl) qtyEl.textContent = qty;
+        const controlEl = document.getElementById('qty-control-' + product.id);
+        if (controlEl) controlEl.classList.toggle('has-qty', qty > 0);
+        const cardEl = document.getElementById('card-' + product.id);
+        if (cardEl) cardEl.classList.toggle('has-qty', qty > 0);
       });
     });
     renderSummary();
   }
 
   function init() {
+    renderCategoryNav();
     renderCatalog();
+    initCategoryNavScroll();
+    initSummaryToggle();
     render();
 
     const form = document.getElementById('order-form');

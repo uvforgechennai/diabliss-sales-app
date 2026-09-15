@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diabliss Consumer Products — Order Online</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-name">DIABLISS</span>
+    <span class="brand-tagline">Low Glycemic Index Foods</span>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="content-grid">
+
+    <div class="main-col">
+
+      <section class="order-form" id="order-form">
+        <h2>Delivery Details</h2>
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="fullName">Full Name <span class="req">*</span></label>
+            <input type="text" id="fullName" name="fullName" required autocomplete="name">
+          </div>
+
+          <div class="form-field">
+            <label for="whatsapp">WhatsApp Number <span class="req">*</span></label>
+            <input type="tel" id="whatsapp" name="whatsapp" required maxlength="10" pattern="[0-9]{10}" placeholder="10-digit mobile number" autocomplete="tel">
+          </div>
+
+          <div class="form-field">
+            <label for="email">Email <span class="req">*</span></label>
+            <input type="email" id="email" name="email" required autocomplete="email">
+          </div>
+
+          <div class="form-field form-field-wide">
+            <label for="address">Delivery Address <span class="req">*</span></label>
+            <textarea id="address" name="address" rows="3" required autocomplete="street-address"></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="city">City <span class="req">*</span></label>
+            <input type="text" id="city" name="city" required autocomplete="address-level2">
+          </div>
+
+          <div class="form-field">
+            <label for="state">State <span class="req">*</span></label>
+            <select id="state" name="state" required autocomplete="address-level1">
+              <option value="">Select State</option>
+              <option>Andhra Pradesh</option>
+              <option>Arunachal Pradesh</option>
+              <option>Assam</option>
+              <option>Bihar</option>
+              <option>Chhattisgarh</option>
+              <option>Goa</option>
+              <option>Gujarat</option>
+              <option>Haryana</option>
+              <option>Himachal Pradesh</option>
+              <option>Jharkhand</option>
+              <option>Karnataka</option>
+              <option>Kerala</option>
+              <option>Madhya Pradesh</option>
+              <option>Maharashtra</option>
+              <option>Manipur</option>
+              <option>Meghalaya</option>
+              <option>Mizoram</option>
+              <option>Nagaland</option>
+              <option>Odisha</option>
+              <option>Punjab</option>
+              <option>Rajasthan</option>
+              <option>Sikkim</option>
+              <option>Tamil Nadu</option>
+              <option>Telangana</option>
+              <option>Tripura</option>
+              <option>Uttar Pradesh</option>
+              <option>Uttarakhand</option>
+              <option>West Bengal</option>
+              <option>Andaman and Nicobar Islands</option>
+              <option>Chandigarh</option>
+              <option>Dadra and Nagar Haveli and Daman and Diu</option>
+              <option>Delhi</option>
+              <option>Jammu and Kashmir</option>
+              <option>Ladakh</option>
+              <option>Lakshadweep</option>
+              <option>Puducherry</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="pincode">Pincode <span class="req">*</span></label>
+            <input type="text" id="pincode" name="pincode" required maxlength="6" pattern="[0-9]{6}" placeholder="6-digit pincode" autocomplete="postal-code">
+          </div>
+        </div>
+      </section>
+
+      <section class="catalog" id="catalog">
+        <h2>Our Products</h2>
+        <div id="catalog-container"></div>
+      </section>
+
+    </div>
+
+    <aside class="summary-panel" id="summary-panel">
+      <div class="summary-inner">
+        <h3 class="summary-title">Order Summary</h3>
+        <div class="summary-items" id="summary-items">
+          <p class="summary-empty">No items added yet</p>
+        </div>
+        <div class="summary-totals">
+          <div class="summary-row">
+            <span>MRP Total</span>
+            <span id="summary-mrp">₹0</span>
+          </div>
+          <div class="summary-row summary-discount" id="summary-discount-row" hidden>
+            <span id="summary-discount-label">Discount</span>
+            <span id="summary-discount-amount">-₹0</span>
+          </div>
+          <div class="summary-row summary-shipping">
+            <span>Shipping</span>
+            <span>FREE</span>
+          </div>
+          <div class="summary-row summary-final">
+            <span>Final Amount</span>
+            <span id="summary-final">₹0</span>
+          </div>
+        </div>
+        <button type="button" id="proceed-btn" class="proceed-btn" disabled>Proceed to Pay</button>
+        <p class="payment-error" id="payment-error" hidden></p>
+      </div>
+    </aside>
+
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <p>&copy; <span id="year"></span> Diabliss Consumer Products Private Limited</p>
+  <p>WhatsApp us: <a href="https://wa.me/918939853354">8939853354</a></p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="js/payment.js"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed — Diabliss</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-name">DIABLISS</span>
+    <span class="brand-tagline">Low Glycemic Index Foods</span>
+  </div>
+</header>
+
+<main class="page confirm-page">
+  <div class="confirm-card">
+    <div class="confirm-icon">✔</div>
+    <h1>Thank you for your order!</h1>
+    <p class="confirm-order-id">Order ID: <strong id="order-id">—</strong></p>
+
+    <div class="confirm-summary" id="confirm-summary">
+      <p>Loading your order details…</p>
+    </div>
+
+    <p class="confirm-dispatch">Your order will be dispatched within 2-3 working days.</p>
+    <p class="confirm-support">For queries, WhatsApp us: <a id="whatsapp-link" href="https://wa.me/918939853354">8939853354</a></p>
+
+    <a href="index.html" class="back-link">← Back to Shop</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p>&copy; <span id="year"></span> Diabliss Consumer Products Private Limited</p>
+</footer>
+
+<script src="js/config.js"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+  document.getElementById('whatsapp-link').textContent = CONFIG.WHATSAPP_SUPPORT;
+  document.getElementById('whatsapp-link').href = 'https://wa.me/91' + CONFIG.WHATSAPP_SUPPORT;
+
+  function formatRupees(amount) {
+    return '₹' + Number(amount).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const orderId = params.get('order_id');
+  const summaryEl = document.getElementById('confirm-summary');
+
+  if (!orderId) {
+    document.getElementById('order-id').textContent = 'N/A';
+    summaryEl.innerHTML = '<p>We could not find your order details on this page. If you have completed a payment, ' +
+      'please WhatsApp us with your payment reference and we will confirm your order shortly.</p>';
+  } else {
+    document.getElementById('order-id').textContent = orderId;
+    const raw = sessionStorage.getItem('diabliss_order_' + orderId);
+
+    if (!raw) {
+      summaryEl.innerHTML = '<p>Your order has been placed successfully. Order details are not available on this ' +
+        'device/session, but a confirmation has been sent to your registered email and WhatsApp number.</p>';
+    } else {
+      const order = JSON.parse(raw);
+
+      const itemsHtml = order.products.map(function (item) {
+        return '<div class="confirm-item">' +
+          '<span>' + escapeHtml(item.name) + ' × ' + item.qty + '</span>' +
+          '<span>' + formatRupees(item.lineTotal) + '</span>' +
+          '</div>';
+      }).join('');
+
+      const discountHtml = order.discountAmount > 0
+        ? '<div class="confirm-row"><span>Discount (' + order.discountPercent + '%)</span><span>-' + formatRupees(order.discountAmount) + '</span></div>'
+        : '';
+
+      summaryEl.innerHTML =
+        '<div class="confirm-items">' + itemsHtml + '</div>' +
+        '<div class="confirm-totals">' +
+          '<div class="confirm-row"><span>MRP Total</span><span>' + formatRupees(order.mrpTotal) + '</span></div>' +
+          discountHtml +
+          '<div class="confirm-row"><span>Shipping</span><span>FREE</span></div>' +
+          '<div class="confirm-row confirm-row-final"><span>Amount Paid</span><span>' + formatRupees(order.finalAmount) + '</span></div>' +
+        '</div>' +
+        '<div class="confirm-address">' +
+          '<strong>Delivery Address</strong><br>' +
+          escapeHtml(order.name) + '<br>' +
+          escapeHtml(order.address) + ', ' + escapeHtml(order.city) + ', ' + escapeHtml(order.state) + ' - ' + escapeHtml(order.pincode) + '<br>' +
+          'WhatsApp: ' + escapeHtml(order.whatsapp) +
+        '</div>';
+    }
+  }
+</script>
+</body>
+</html>

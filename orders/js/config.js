@@ -1,0 +1,14 @@
+const CONFIG = {
+  RAZORPAY_KEY: 'rzp_live_TcGmnDuZ6rGOWC',
+  GAS_URL: 'TO_BE_UPDATED_AFTER_GAS_DEPLOYMENT',
+  BUSINESS_NAME: 'Diabliss Consumer Products',
+  WHATSAPP_SUPPORT: '8939853354',
+  CURRENCY: 'INR',
+  DISCOUNT_THRESHOLD: 300,
+  DEFAULT_DISCOUNT: 5,
+  VIP_DISCOUNTS: {
+    vip10: 10,
+    vip15: 15,
+    vip20: 20
+  }
+};

@@ -105,6 +105,31 @@ Once `lowgifoods.co.in/orders` is live:
 3. Confirm the account is live-mode enabled, since `RAZORPAY_KEY` in
    `js/config.js` is a **live** key (`rzp_live_...`), not a test key.
 
+## Managing stock (marking items out of stock)
+
+You don't need to edit any code or ask a developer to stock an item out —
+it's controlled from a tab in the same Google Sheet you set up in Step 1.
+
+1. Open your **Diabliss Orders DB** Google Sheet.
+2. The first time an order comes in (or the first time anyone visits the
+   site after this feature was deployed), a new tab called **"Stock
+   Status"** is created automatically, pre-filled with every product and a
+   checked ("in stock") checkbox.
+3. To stock an item out: find its row and **uncheck the box** in the
+   **In Stock** column.
+4. To bring it back: **re-check the box**.
+
+That's it — no redeploy needed for this. The site checks this sheet every
+time someone loads the page; an unchecked item shows a grayed-out
+"Out of Stock" badge instead of the Add button and can't be added to the
+cart. If the site can't reach the sheet for any reason, it fails open
+(treats everything as in stock) rather than blocking orders.
+
+This does require the one-time GAS redeploy described in Step 2 if you set
+up the backend before this feature existed — in the Apps Script editor,
+replace the code with the latest `gas/Code.gs` from this repo, then
+**Deploy → Manage deployments → Edit → New version → Deploy**.
+
 ## Discount logic
 
 - Orders under ₹300: no discount.

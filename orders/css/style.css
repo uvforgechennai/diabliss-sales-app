@@ -57,10 +57,19 @@ a {
   gap: 12px;
 }
 
-.brand-name {
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: 1px;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo {
+  display: block;
+  height: 44px;
+  width: auto;
+  background: var(--white);
+  padding: 5px 10px;
+  border-radius: 8px;
 }
 
 .brand-tagline {
@@ -595,9 +604,29 @@ a {
 
 .site-footer {
   text-align: center;
-  padding: 20px;
+  padding: 24px 20px;
   color: var(--text-muted);
   font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.site-footer p {
+  margin: 0 0 4px;
+}
+
+.footer-company {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.footer-contact a {
+  color: var(--text-muted);
+  text-decoration: underline;
+}
+
+.footer-copyright {
+  margin-top: 12px;
+  font-size: 0.78rem;
 }
 
 /* Confirm page */

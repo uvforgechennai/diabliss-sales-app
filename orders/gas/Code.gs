@@ -6,15 +6,29 @@
 const CONFIG = {
   SHEET_ID: '169hN2yoSKTUzwrf8-9XCFsbEXyyAE5ZbyUId2fS4nbk',
   CALLMEBOT_PHONE: '918939853354',
-  CALLMEBOT_APIKEY: 'TO_BE_FILLED',
-  NOTIFY_EMAILS: ['info@diabliss.com', 'nithya@diabliss.com']
+  NOTIFY_EMAILS: ['info@diabliss.com', 'nithya@diabliss.com'],
+  RAZORPAY_KEY_ID: 'rzp_live_TcGmnDuZ6rGOWC'
 };
+
+// Real secrets never live in source (this repo is public). They're read from
+// Script Properties instead — set once via the Apps Script editor's
+// Project Settings → Script Properties, never committed to git.
+function getSecret_(key) {
+  const value = PropertiesService.getScriptProperties().getProperty(key);
+  if (!value) {
+    throw new Error('Missing Script Property: ' + key + ' (set it under Project Settings → Script Properties)');
+  }
+  return value;
+}
 
 const SHEET_NAME = 'Diabliss Orders';
 const HEADERS = [
   'Order ID', 'Timestamp', 'Name', 'WhatsApp', 'Email', 'Address', 'City', 'State', 'Pincode',
   'Products', 'MRP Total', 'Discount%', 'Discount Amount', 'Final Amount', 'Razorpay Payment ID', 'Status'
 ];
+
+const PENDING_SHEET_NAME = 'Pending Orders';
+const PENDING_HEADERS = ['Razorpay Order ID', 'Created At', 'Order JSON', 'Diabliss Order ID'];
 
 const STOCK_SHEET_NAME = 'Stock Status';
 const STOCK_HEADERS = ['Product ID', 'Product Name', 'In Stock'];
@@ -95,44 +109,43 @@ function getOrCreateStockSheet_() {
   return sheet;
 }
 
+/**
+ * Three kinds of POST land here, told apart by payload shape:
+ * 1. A Razorpay webhook event ({event, payload}).
+ * 2. A "create order" call from the storefront, before checkout opens.
+ * 3. A "finalize" call from the storefront, after checkout succeeds.
+ */
 function doPost(e) {
   try {
-    const order = JSON.parse(e.postData.contents);
-    validateOrder_(order);
+    const body = JSON.parse(e.postData.contents);
 
-    const lock = LockService.getScriptLock();
-    lock.waitLock(30000);
-
-    let orderId;
-    try {
-      const sheet = getOrCreateSheet_();
-      orderId = generateOrderId_(sheet);
-      appendOrderRow_(sheet, orderId, order);
-    } finally {
-      lock.releaseLock();
+    if (body.event && body.payload) {
+      return handleRazorpayWebhook_(e, body);
     }
-
-    try {
-      sendConfirmationEmail_(orderId, order);
-    } catch (emailErr) {
-      Logger.log('Email send failed: ' + emailErr);
+    if (body.action === 'createOrder') {
+      return handleCreateOrder_(body);
     }
-
-    try {
-      sendWhatsAppNotification_(orderId, order);
-    } catch (waErr) {
-      Logger.log('WhatsApp send failed: ' + waErr);
-    }
-
-    return jsonResponse_({ status: 'ok', orderId: orderId });
+    return handleFinalizeOrder_(body);
   } catch (err) {
     Logger.log('doPost error: ' + err);
     return jsonResponse_({ status: 'error', message: String(err) });
   }
 }
 
-function validateOrder_(order) {
-  const required = ['name', 'whatsapp', 'email', 'address', 'city', 'state', 'pincode', 'products', 'finalAmount', 'razorpayPaymentId'];
+function handleCreateOrder_(body) {
+  validateDraftOrder_(body);
+
+  const amountPaise = Math.round(body.finalAmount * 100);
+  const razorpayOrder = callRazorpayCreateOrder_(amountPaise);
+
+  const pendingSheet = getOrCreatePendingSheet_();
+  pendingSheet.appendRow([razorpayOrder.id, new Date(), JSON.stringify(body), '']);
+
+  return jsonResponse_({ status: 'ok', razorpayOrderId: razorpayOrder.id });
+}
+
+function validateDraftOrder_(order) {
+  const required = ['name', 'whatsapp', 'email', 'address', 'city', 'state', 'pincode', 'products', 'finalAmount'];
   required.forEach(function (field) {
     if (order[field] === undefined || order[field] === null || order[field] === '') {
       throw new Error('Missing required field: ' + field);
@@ -141,6 +154,143 @@ function validateOrder_(order) {
   if (!Array.isArray(order.products) || order.products.length === 0) {
     throw new Error('Order must contain at least one product');
   }
+}
+
+function callRazorpayCreateOrder_(amountPaise) {
+  const auth = Utilities.base64Encode(CONFIG.RAZORPAY_KEY_ID + ':' + getSecret_('RAZORPAY_KEY_SECRET'));
+  const response = UrlFetchApp.fetch('https://api.razorpay.com/v1/orders', {
+    method: 'post',
+    contentType: 'application/json',
+    headers: { Authorization: 'Basic ' + auth },
+    payload: JSON.stringify({
+      amount: amountPaise,
+      currency: 'INR',
+      receipt: 'diabliss-' + new Date().getTime()
+    }),
+    muteHttpExceptions: true
+  });
+
+  const result = JSON.parse(response.getContentText());
+  if (!result.id) {
+    throw new Error('Razorpay order creation failed: ' + response.getContentText());
+  }
+  return result;
+}
+
+function handleFinalizeOrder_(body) {
+  ['razorpayOrderId', 'razorpayPaymentId', 'razorpaySignature'].forEach(function (field) {
+    if (!body[field]) throw new Error('Missing required field: ' + field);
+  });
+
+  if (!verifyRazorpaySignature_(body.razorpayOrderId, body.razorpayPaymentId, body.razorpaySignature)) {
+    throw new Error('Invalid payment signature');
+  }
+
+  const orderId = finalizeOrder_(body.razorpayOrderId, body.razorpayPaymentId);
+  return jsonResponse_({ status: 'ok', orderId: orderId });
+}
+
+function verifyRazorpaySignature_(razorpayOrderId, razorpayPaymentId, signature) {
+  const payload = razorpayOrderId + '|' + razorpayPaymentId;
+  const bytes = Utilities.computeHmacSha256Signature(payload, getSecret_('RAZORPAY_KEY_SECRET'));
+  const expected = bytes.map(function (b) {
+    const hex = (b < 0 ? b + 256 : b).toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  }).join('');
+  return expected === signature;
+}
+
+/**
+ * Server-to-server backstop: Razorpay calls this directly when a payment
+ * captures, independent of whether the customer's browser ever finishes
+ * the finalize call above. finalizeOrder_ is idempotent, so whichever of
+ * the two paths (browser or webhook) arrives first wins, and the other
+ * is a no-op.
+ */
+function handleRazorpayWebhook_(e, body) {
+  const token = e.parameter && e.parameter.token;
+  if (token !== getSecret_('RAZORPAY_WEBHOOK_TOKEN')) {
+    Logger.log('Webhook token mismatch, ignoring');
+    return jsonResponse_({ status: 'ignored' });
+  }
+
+  if (body.event !== 'payment.captured') {
+    return jsonResponse_({ status: 'ignored' });
+  }
+
+  const payment = body.payload && body.payload.payment && body.payload.payment.entity;
+  if (!payment || !payment.order_id) {
+    return jsonResponse_({ status: 'ignored' });
+  }
+
+  try {
+    finalizeOrder_(payment.order_id, payment.id);
+  } catch (err) {
+    Logger.log('Webhook finalize failed: ' + err);
+  }
+
+  return jsonResponse_({ status: 'ok' });
+}
+
+function finalizeOrder_(razorpayOrderId, razorpayPaymentId) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    const pendingSheet = getOrCreatePendingSheet_();
+    const pending = findPendingRow_(pendingSheet, razorpayOrderId);
+    if (!pending) {
+      throw new Error('No pending order found for Razorpay order ' + razorpayOrderId);
+    }
+    if (pending.diablissOrderId) {
+      return pending.diablissOrderId; // Already finalized by the other path.
+    }
+
+    const order = JSON.parse(pending.orderJson);
+    order.razorpayPaymentId = razorpayPaymentId;
+
+    const sheet = getOrCreateSheet_();
+    const orderId = generateOrderId_(sheet);
+    appendOrderRow_(sheet, orderId, order);
+    pendingSheet.getRange(pending.rowIndex, 4).setValue(orderId);
+
+    try {
+      sendConfirmationEmail_(orderId, order);
+    } catch (emailErr) {
+      Logger.log('Email send failed: ' + emailErr);
+    }
+    try {
+      sendWhatsAppNotification_(orderId, order);
+    } catch (waErr) {
+      Logger.log('WhatsApp send failed: ' + waErr);
+    }
+
+    return orderId;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function getOrCreatePendingSheet_() {
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  let sheet = ss.getSheetByName(PENDING_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(PENDING_SHEET_NAME);
+    sheet.appendRow(PENDING_HEADERS);
+  }
+  return sheet;
+}
+
+function findPendingRow_(sheet, razorpayOrderId) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return null;
+
+  const data = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
+  for (let i = 0; i < data.length; i++) {
+    if (data[i][0] === razorpayOrderId) {
+      return { rowIndex: i + 2, orderJson: data[i][2], diablissOrderId: data[i][3] };
+    }
+  }
+  return null;
 }
 
 function getOrCreateSheet_() {
@@ -237,7 +387,7 @@ function sendWhatsAppNotification_(orderId, order) {
     '🔖 Razorpay: ' + order.razorpayPaymentId;
 
   const url = 'https://api.callmebot.com/whatsapp.php?phone=' + CONFIG.CALLMEBOT_PHONE +
-    '&text=' + encodeURIComponent(message) + '&apikey=' + CONFIG.CALLMEBOT_APIKEY;
+    '&text=' + encodeURIComponent(message) + '&apikey=' + getSecret_('CALLMEBOT_APIKEY');
 
   UrlFetchApp.fetch(url, { muteHttpExceptions: true });
 }

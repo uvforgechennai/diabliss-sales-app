@@ -472,6 +472,10 @@ a {
   font-size: 0.95rem;
 }
 
+.summary-row[hidden] {
+  display: none;
+}
+
 .summary-discount span:last-child {
   color: var(--green);
   font-weight: 600;

@@ -2,69 +2,69 @@ const PRODUCT_CATALOG = [
   {
     id: 'sugar',
     name: 'Low GI Sugar',
-    image: 'images/sugar.jpg',
+    image: null,
     products: [
-      { id: 'sugar-40x5g', name: 'Sugar 40x5g Sachet Box', mrp: 99 },
-      { id: 'sugar-500g', name: 'Sugar 500g Standy Pouch', mrp: 160 },
-      { id: 'sugar-1kg', name: 'Sugar 1kg PET Jar', mrp: 295 },
-      { id: 'sugar-1.75kg', name: 'Sugar 1.75kg PET Jar', mrp: 499 },
-      { id: 'sugar-5kg', name: 'Sugar 5kg', mrp: 1250 },
-      { id: 'sugar-10kg', name: 'Sugar 10kg', mrp: 2300 }
+      { id: 'sugar-40x5g', name: 'Sugar 40x5g Sachet Box', mrp: 99, image: 'images/sugar-40x5g.jpg' },
+      { id: 'sugar-500g', name: 'Sugar 500g Standy Pouch', mrp: 160, image: 'images/sugar-500g.jpg' },
+      { id: 'sugar-1kg', name: 'Sugar 1kg PET Jar', mrp: 295, image: 'images/sugar-1kg.jpg' },
+      { id: 'sugar-1.75kg', name: 'Sugar 1.75kg PET Jar', mrp: 499, image: 'images/sugar-1.75kg.jpg' },
+      { id: 'sugar-5kg', name: 'Sugar 5kg', mrp: 1250, image: 'images/sugar-5kg.jpg' },
+      { id: 'sugar-10kg', name: 'Sugar 10kg', mrp: 2300, image: 'images/sugar-10kg.jpg' }
     ]
   },
   {
     id: 'jaggery',
     name: 'Low GI Jaggery Powder',
-    image: 'images/jaggery.jpg',
+    image: null,
     products: [
-      { id: 'jaggery-500g', name: 'Jaggery 500g Standy Pouch', mrp: 160 },
-      { id: 'jaggery-750g', name: 'Jaggery 750g PET Jar', mrp: 225 },
-      { id: 'jaggery-1.25kg', name: 'Jaggery 1.25kg PET Jar', mrp: 365 },
-      { id: 'jaggery-5kg', name: 'Jaggery 5kg Bag', mrp: 1250 }
+      { id: 'jaggery-500g', name: 'Jaggery 500g Standy Pouch', mrp: 160, image: 'images/jaggery-500g.jpg' },
+      { id: 'jaggery-750g', name: 'Jaggery 750g PET Jar', mrp: 225, image: 'images/jaggery-750g.jpg' },
+      { id: 'jaggery-1.25kg', name: 'Jaggery 1.25kg PET Jar', mrp: 365, image: 'images/jaggery-1.25kg.jpg' },
+      { id: 'jaggery-5kg', name: 'Jaggery 5kg Bag', mrp: 1250, image: 'images/jaggery-5kg.jpg' }
     ]
   },
   {
     id: 'tea',
     name: 'Tea Premix',
-    image: 'images/tea.jpg',
+    image: null,
     products: [
-      { id: 'tea-lemon-10x10g', name: 'Lemon Tea 10x10g', mrp: 76 },
-      { id: 'tea-lemon-30x10g', name: 'Lemon Tea 30x10g', mrp: 201 },
-      { id: 'tea-lemon-500g', name: 'Lemon Tea 500g', mrp: 241 },
-      { id: 'tea-combo-30x10g', name: 'Combo Tea 30x10g', mrp: 223 },
-      { id: 'tea-ginger-10x10g', name: 'Ginger Tea 10x10g', mrp: 89 },
-      { id: 'tea-masala-10x10g', name: 'Masala Chai 10x10g', mrp: 89 }
+      { id: 'tea-lemon-10x10g', name: 'Lemon Tea 10x10g', mrp: 76, image: 'images/tea-lemon-10x10g.jpg' },
+      { id: 'tea-lemon-30x10g', name: 'Lemon Tea 30x10g', mrp: 201, image: 'images/tea-lemon-30x10g.jpg' },
+      { id: 'tea-lemon-500g', name: 'Lemon Tea 500g', mrp: 241, image: 'images/tea.jpg' },
+      { id: 'tea-combo-30x10g', name: 'Combo Tea 30x10g', mrp: 223, image: 'images/tea-combo-30x10g.jpg' },
+      { id: 'tea-ginger-10x10g', name: 'Ginger Tea 10x10g', mrp: 89, image: 'images/tea-ginger-10x10g.jpg' },
+      { id: 'tea-masala-10x10g', name: 'Masala Chai 10x10g', mrp: 89, image: 'images/tea-masala-10x10g.jpg' }
     ]
   },
   {
     id: 'cookies',
     name: 'Millet Cookies',
-    image: 'images/cookies.jpg',
+    image: null,
     products: [
-      { id: 'cookies-millets-120g', name: 'Millets Cookies 120g', mrp: 80 },
-      { id: 'cookies-moringa-120g', name: 'Millets with Moringa Leaves Cookies 120g', mrp: 89 },
-      { id: 'cookies-chia-120g', name: 'Millets with Chia Seeds Cookies 120g', mrp: 89 }
+      { id: 'cookies-millets-120g', name: 'Millets Cookies 120g', mrp: 80, image: 'images/cookies-millets-120g.jpg' },
+      { id: 'cookies-moringa-120g', name: 'Millets with Moringa Leaves Cookies 120g', mrp: 89, image: 'images/cookies-moringa-120g.jpg' },
+      { id: 'cookies-chia-120g', name: 'Millets with Chia Seeds Cookies 120g', mrp: 89, image: 'images/cookies-chia-120g.jpg' }
     ]
   },
   {
     id: 'jam',
     name: 'Fruit Jam',
-    image: 'images/jam.jpg',
+    image: null,
     products: [
-      { id: 'jam-mixed-fruit-225g', name: 'Mixed Fruit Jam 225g', mrp: 215 },
-      { id: 'jam-guava-225g', name: 'Guava Jam 225g', mrp: 225 },
-      { id: 'jam-pineapple-ginger-225g', name: 'Pineapple Ginger Jam 225g', mrp: 235 }
+      { id: 'jam-mixed-fruit-225g', name: 'Mixed Fruit Jam 225g', mrp: 215, image: 'images/jam-mixed-fruit-225g.jpg' },
+      { id: 'jam-guava-225g', name: 'Guava Jam 225g', mrp: 225, image: 'images/jam-guava-225g.jpg' },
+      { id: 'jam-pineapple-ginger-225g', name: 'Pineapple Ginger Jam 225g', mrp: 235, image: 'images/jam-pineapple-ginger-225g.jpg' }
     ]
   },
   {
     id: 'halwa-kheer',
     name: 'Halwa & Kheer Premix',
-    image: 'images/halwa-kheer.jpg',
+    image: null,
     products: [
-      { id: 'halwa-moong-dhal-225g', name: 'Moong Dhal Halwa 225g', mrp: 240 },
-      { id: 'halwa-whole-wheat-225g', name: 'Whole Wheat Halwa 225g', mrp: 199 },
-      { id: 'kheer-basmati-rice-225g', name: 'Basmati Rice Kheer 225g', mrp: 199 },
-      { id: 'kheer-vermicilli-225g', name: 'Vermicilli Kheer 225g', mrp: 199 }
+      { id: 'halwa-moong-dhal-225g', name: 'Moong Dhal Halwa 225g', mrp: 240, image: 'images/halwa-moong-dhal-225g.jpg' },
+      { id: 'halwa-whole-wheat-225g', name: 'Whole Wheat Halwa 225g', mrp: 199, image: 'images/halwa-whole-wheat-225g.jpg' },
+      { id: 'kheer-basmati-rice-225g', name: 'Basmati Rice Kheer 225g', mrp: 199, image: 'images/kheer-basmati-rice-225g.jpg' },
+      { id: 'kheer-vermicilli-225g', name: 'Vermicilli Kheer 225g', mrp: 199, image: 'images/kheer-vermicilli-225g.jpg' }
     ]
   },
   {

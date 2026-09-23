@@ -30,11 +30,11 @@ const Payment = (function () {
     btn.textContent = isProcessing ? 'Processing…' : 'Proceed to Pay';
   }
 
-  function submitOrderToBackend(orderPayload) {
+  function callBackend(payload) {
     return fetch(CONFIG.GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(orderPayload)
+      body: JSON.stringify(payload)
     }).then(function (res) { return res.json(); });
   }
 
@@ -51,10 +51,42 @@ const Payment = (function () {
     }
 
     const customer = getFormData();
+    const orderDraft = {
+      action: 'createOrder',
+      name: customer.name,
+      whatsapp: customer.whatsapp,
+      email: customer.email,
+      address: customer.address,
+      city: customer.city,
+      state: customer.state,
+      pincode: customer.pincode,
+      products: totals.items,
+      mrpTotal: totals.mrpTotal,
+      discountPercent: totals.discountPercent,
+      discountAmount: totals.discountAmount,
+      finalAmount: totals.finalAmount
+    };
 
+    setProcessing(true);
+
+    callBackend(orderDraft)
+      .then(function (result) {
+        if (!result || !result.razorpayOrderId) {
+          throw new Error('Invalid response from server');
+        }
+        setProcessing(false);
+        launchRazorpay_(result.razorpayOrderId, customer, orderDraft);
+      })
+      .catch(function () {
+        setProcessing(false);
+        showError('Could not start checkout right now. Please try again in a moment.');
+      });
+  }
+
+  function launchRazorpay_(razorpayOrderId, customer, orderDraft) {
     const options = {
       key: CONFIG.RAZORPAY_KEY,
-      amount: Math.round(totals.finalAmount * 100),
+      order_id: razorpayOrderId,
       currency: CONFIG.CURRENCY,
       name: CONFIG.BUSINESS_NAME,
       description: 'Order Payment',
@@ -72,39 +104,31 @@ const Payment = (function () {
       theme: { color: '#1a3c6e' },
       handler: function (response) {
         setProcessing(true);
-        const orderPayload = {
-          name: customer.name,
-          whatsapp: customer.whatsapp,
-          email: customer.email,
-          address: customer.address,
-          city: customer.city,
-          state: customer.state,
-          pincode: customer.pincode,
-          products: totals.items,
-          mrpTotal: totals.mrpTotal,
-          discountPercent: totals.discountPercent,
-          discountAmount: totals.discountAmount,
-          finalAmount: totals.finalAmount,
-          razorpayPaymentId: response.razorpay_payment_id
-        };
 
-        submitOrderToBackend(orderPayload)
+        callBackend({
+          razorpayOrderId: response.razorpay_order_id,
+          razorpayPaymentId: response.razorpay_payment_id,
+          razorpaySignature: response.razorpay_signature
+        })
           .then(function (result) {
             if (!result || !result.orderId) {
               throw new Error('Invalid response from server');
             }
             sessionStorage.setItem(
               'diabliss_order_' + result.orderId,
-              JSON.stringify(Object.assign({}, orderPayload, { orderId: result.orderId }))
+              JSON.stringify(Object.assign({}, orderDraft, {
+                orderId: result.orderId,
+                razorpayPaymentId: response.razorpay_payment_id
+              }))
             );
             window.location.href = 'confirm.html?order_id=' + encodeURIComponent(result.orderId);
           })
           .catch(function () {
             setProcessing(false);
             showError(
-              'Your payment was successful (Payment ID: ' + response.razorpay_payment_id + ') but we could not ' +
-              'record your order automatically. Please WhatsApp us at ' + CONFIG.WHATSAPP_SUPPORT +
-              ' with this Payment ID so we can confirm your order.'
+              'Your payment was successful (Payment ID: ' + response.razorpay_payment_id + '). We\'re confirming ' +
+              'your order automatically — if you don\'t receive a confirmation email shortly, please WhatsApp us ' +
+              'at ' + CONFIG.WHATSAPP_SUPPORT + ' with this Payment ID.'
             );
           });
       },

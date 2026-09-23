@@ -115,9 +115,13 @@ Commit and push this change so it goes live.
 2. Send that contact a WhatsApp message saying exactly:
    `I allow callmebot to send me messages`
 3. CallMeBot will reply with your personal API key.
-4. Paste that key into `CALLMEBOT_APIKEY` in `orders/gas/Code.gs`, commit,
-   and push to `main` — the GAS deploy workflow picks it up automatically
-   (see Step 2's one-time clasp setup if you haven't done that yet).
+4. **This repo is public**, so this key never goes into any file that gets
+   committed. Instead: open the Apps Script project (script.google.com) →
+   gear icon (**Project Settings**) → scroll to **Script Properties** →
+   **Add script property**:
+   - Property: `CALLMEBOT_APIKEY`
+   - Value: the key CallMeBot sent you
+   - Save. No commit, no redeploy needed — `Code.gs` reads it at runtime.
 
 ### 5. Connect this GitHub repo to Hostinger for auto-deploy
 
@@ -143,6 +147,42 @@ Once `lowgifoods.co.in/orders` is live:
    `https://lowgifoods.co.in` as an authorized domain/origin.
 3. Confirm the account is live-mode enabled, since `RAZORPAY_KEY` in
    `js/config.js` is a **live** key (`rzp_live_...`), not a test key.
+
+### 7. Fill in the Razorpay Key Secret and set up the payment webhook
+
+Payments go through a two-step flow: the backend creates a real Razorpay
+Order before checkout opens (so payments can be cryptographically verified),
+and Razorpay also calls the backend directly the moment a payment captures —
+a safety net independent of the customer's browser, in case their connection
+drops right after paying. Both need a secret, and — same as CallMeBot above
+— **neither goes into any committed file**, since this repo is public.
+Both are set as Script Properties instead (Apps Script project → gear icon
+→ **Project Settings** → **Script Properties** → **Add script property**):
+
+1. **Key Secret**: Razorpay Dashboard → **Settings → API Keys** → find the
+   key pair for `rzp_live_TcGmnDuZ6rGOWC` → reveal/download the **Key
+   Secret**. Add a Script Property:
+   - Property: `RAZORPAY_KEY_SECRET`
+   - Value: the secret from Razorpay
+2. **Webhook token**: pick any random secret string (or generate one, e.g.
+   `openssl rand -base64 32` in a terminal). Add a Script Property:
+   - Property: `RAZORPAY_WEBHOOK_TOKEN`
+   - Value: your random string
+3. **Webhook**: Razorpay Dashboard → **Settings → Webhooks → Add New
+   Webhook**:
+   - Webhook URL: your `GAS_URL` (from `js/config.js`) with
+     `?token=` and that same random string appended, e.g.
+     `https://script.google.com/macros/s/AKfycb.../exec?token=YOUR_RANDOM_STRING`
+     (this is what stops random requests on the internet from faking a
+     "payment succeeded" call to your backend — keep it secret, same as any
+     password).
+   - Active events: check **`payment.captured`** only.
+   - Save. Razorpay will send a test ping — it's fine if the Script
+     Properties aren't saved yet at that exact moment; real traffic only
+     starts once you place a real order.
+
+No commit or redeploy is needed for either of these — Script Properties take
+effect immediately, independent of what's in git.
 
 ## Managing stock (marking items out of stock)
 

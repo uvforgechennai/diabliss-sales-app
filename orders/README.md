@@ -139,22 +139,41 @@ Commit and push this change so it goes live.
 
 ### 5b. Also mirror it at diabliss.in/orders
 
-The same repo/branch can auto-deploy to a second domain — no code or config
-changes needed, since the site has no hardcoded domain anywhere.
+⚠️ **This repo also contains the unrelated field-sales app at its root.**
+Hostinger's Git deploy clones the *entire* repository into whatever
+directory you give it — it does not let you deploy just the `orders/`
+subfolder on its own. To avoid touching the existing diabliss.in site or
+exposing the sales-app code, deploy the repo **outside** the public web
+root, then symlink only the `orders/` folder into `public_html`. Never
+point the Git deploy's destination directly at `public_html` or
+`public_html/orders`.
 
 1. In Hostinger, switch to the **diabliss.in hosting account** (same login,
    separate hPanel from the lowgifoods.co.in one).
-2. Go to **Advanced → Git** and add a repository the same way as Step 5:
-   - Repository URL: this repo's GitHub URL (same deploy key/token).
+2. Go to **Advanced → Git** and add a repository:
+   - Repository URL: this repo's GitHub URL (same deploy key/token as
+     lowgifoods.co.in).
    - Branch: `main`.
-   - Install path: point it at (or symlink) the `orders/` folder to
-     `public_html/orders` under **this** account's document root, so it
-     serves at `diabliss.in/orders`.
-3. Enable **auto-deploy on push**, then trigger an initial manual deploy to
-   confirm it pulls correctly.
+   - Install/destination path: a folder **outside** `public_html`, e.g.
+     `repos/diabliss-sales-app` (check with Hostinger support/docs for the
+     exact non-web-accessible path on your plan — it must not be inside
+     `public_html`).
+3. Enable **auto-deploy on push**, then trigger an initial manual deploy and
+   confirm the folder now contains the repo (including its existing
+   `orders/` subfolder), with nothing yet changed in `public_html`.
+4. Via hPanel's **File Manager** or SSH, create a symlink:
+   ```bash
+   ln -s ~/repos/diabliss-sales-app/orders ~/public_html/orders
+   ```
+   (adjust paths to match step 2). This adds a single new `orders` entry
+   inside `public_html` without modifying or removing anything else
+   already there.
+5. Visit `diabliss.in/orders` to confirm it loads, then separately confirm
+   the existing `diabliss.in` site still loads normally and is untouched.
 
-From then on, every push to `main` updates both `lowgifoods.co.in/orders`
-and `diabliss.in/orders` at the same time, from the same source.
+From then on, every push to `main` updates the cloned copy, and the symlink
+means `diabliss.in/orders` picks up the change immediately — while
+`lowgifoods.co.in/orders` keeps deploying independently per Step 5.
 
 ### 6. Add the live domain(s) to Razorpay
 

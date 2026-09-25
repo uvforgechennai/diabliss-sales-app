@@ -9,6 +9,7 @@ const Cart = (function () {
         id: product.id,
         name: product.name,
         mrp: product.mrp,
+        price: product.price,
         category: category.name
       };
       qtyById[product.id] = 0;
@@ -31,20 +32,9 @@ const Cart = (function () {
     setQty(id, getQty(id) + delta);
   }
 
-  function getRefCode() {
-    const params = new URLSearchParams(window.location.search);
-    return (params.get('ref') || '').toLowerCase();
-  }
-
-  function getDiscountPercent(mrpTotal) {
-    const ref = getRefCode();
-    if (CONFIG.VIP_DISCOUNTS[ref] !== undefined) {
-      return CONFIG.VIP_DISCOUNTS[ref];
-    }
-    if (mrpTotal >= CONFIG.DISCOUNT_THRESHOLD) {
-      return CONFIG.DEFAULT_DISCOUNT;
-    }
-    return 0;
+  function discountPercentFor(mrp, price) {
+    if (!mrp || price >= mrp) return 0;
+    return Math.round(((mrp - price) / mrp) * 100);
   }
 
   function getLineItems() {
@@ -57,18 +47,20 @@ const Cart = (function () {
           id: id,
           name: product.name,
           mrp: product.mrp,
+          price: product.price,
           qty: qty,
-          lineTotal: product.mrp * qty
+          mrpLineTotal: product.mrp * qty,
+          lineTotal: product.price * qty
         };
       });
   }
 
   function computeTotals() {
     const items = getLineItems();
-    const mrpTotal = items.reduce(function (sum, item) { return sum + item.lineTotal; }, 0);
-    const discountPercent = mrpTotal > 0 ? getDiscountPercent(mrpTotal) : 0;
-    const discountAmount = Math.round(mrpTotal * discountPercent) / 100;
-    const finalAmount = mrpTotal - discountAmount;
+    const mrpTotal = items.reduce(function (sum, item) { return sum + item.mrpLineTotal; }, 0);
+    const finalAmount = items.reduce(function (sum, item) { return sum + item.lineTotal; }, 0);
+    const discountAmount = mrpTotal - finalAmount;
+    const discountPercent = mrpTotal > 0 ? Math.round((discountAmount / mrpTotal) * 100) : 0;
     return {
       items: items,
       mrpTotal: mrpTotal,
@@ -165,11 +157,17 @@ const Cart = (function () {
         const img = product.image
           ? '<img class="product-card-image" src="' + product.image + '" alt="' + escapeHtml(product.name) + '" loading="lazy">'
           : '';
+        const discountPercent = discountPercentFor(product.mrp, product.price);
+        const priceHtml = discountPercent > 0
+          ? '<span class="product-card-price">₹' + product.price + '</span>' +
+            '<span class="product-card-mrp product-card-mrp-struck">₹' + product.mrp + '</span>' +
+            '<span class="product-card-discount-badge">' + discountPercent + '% OFF</span>'
+          : '<span class="product-card-price">₹' + product.price + '</span>';
         return '<div class="product-card" id="card-' + product.id + '">' +
           img +
           '<div class="product-card-body">' +
             '<span class="product-card-name">' + escapeHtml(product.name) + '</span>' +
-            '<span class="product-card-mrp">₹' + product.mrp + '</span>' +
+            '<div class="product-card-price-row">' + priceHtml + '</div>' +
           '</div>' +
           '<div class="qty-control" id="qty-control-' + product.id + '">' +
             '<button type="button" class="add-btn" data-action="plus" data-id="' + product.id + '">+ Add</button>' +
@@ -297,8 +295,6 @@ const Cart = (function () {
     setQty: setQty,
     changeQty: changeQty,
     computeTotals: computeTotals,
-    getDiscountPercent: getDiscountPercent,
-    getRefCode: getRefCode,
     isFormValid: isFormValid,
     formatRupees: formatRupees,
     render: render

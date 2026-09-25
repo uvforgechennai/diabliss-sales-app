@@ -1,6 +1,7 @@
 const Cart = (function () {
   const qtyById = {};
   const flatProducts = {};
+  const catalogProductsById = {};
   let outOfStockIds = new Set();
 
   PRODUCT_CATALOG.forEach(function (category) {
@@ -12,6 +13,7 @@ const Cart = (function () {
         price: product.price,
         category: category.name
       };
+      catalogProductsById[product.id] = product;
       qtyById[product.id] = 0;
     });
   });
@@ -35,6 +37,15 @@ const Cart = (function () {
   function discountPercentFor(mrp, price) {
     if (!mrp || price >= mrp) return 0;
     return Math.round(((mrp - price) / mrp) * 100);
+  }
+
+  function buildPriceRowHtml(mrp, price) {
+    const discountPercent = discountPercentFor(mrp, price);
+    return discountPercent > 0
+      ? '<span class="product-card-price">₹' + price + '</span>' +
+        '<span class="product-card-mrp product-card-mrp-struck">₹' + mrp + '</span>' +
+        '<span class="product-card-discount-badge">' + discountPercent + '% OFF</span>'
+      : '<span class="product-card-price">₹' + price + '</span>';
   }
 
   function getLineItems() {
@@ -157,17 +168,11 @@ const Cart = (function () {
         const img = product.image
           ? '<img class="product-card-image" src="' + product.image + '" alt="' + escapeHtml(product.name) + '" loading="lazy">'
           : '';
-        const discountPercent = discountPercentFor(product.mrp, product.price);
-        const priceHtml = discountPercent > 0
-          ? '<span class="product-card-price">₹' + product.price + '</span>' +
-            '<span class="product-card-mrp product-card-mrp-struck">₹' + product.mrp + '</span>' +
-            '<span class="product-card-discount-badge">' + discountPercent + '% OFF</span>'
-          : '<span class="product-card-price">₹' + product.price + '</span>';
         return '<div class="product-card" id="card-' + product.id + '">' +
           img +
           '<div class="product-card-body">' +
             '<span class="product-card-name">' + escapeHtml(product.name) + '</span>' +
-            '<div class="product-card-price-row">' + priceHtml + '</div>' +
+            '<div class="product-card-price-row" id="price-row-' + product.id + '">' + buildPriceRowHtml(product.mrp, product.price) + '</div>' +
           '</div>' +
           '<div class="qty-control" id="qty-control-' + product.id + '">' +
             '<button type="button" class="add-btn" data-action="plus" data-id="' + product.id + '">+ Add</button>' +
@@ -239,7 +244,28 @@ const Cart = (function () {
     });
   }
 
-  function fetchStockStatus() {
+  function applyPriceOverrides(prices) {
+    if (!prices) return;
+    let changed = false;
+    Object.keys(prices).forEach(function (id) {
+      const override = prices[id];
+      if (!(id in flatProducts) || typeof override.mrp !== 'number' || typeof override.price !== 'number') return;
+
+      flatProducts[id].mrp = override.mrp;
+      flatProducts[id].price = override.price;
+      const catalogProduct = catalogProductsById[id];
+      if (catalogProduct) {
+        catalogProduct.mrp = override.mrp;
+        catalogProduct.price = override.price;
+      }
+      const row = document.getElementById('price-row-' + id);
+      if (row) row.innerHTML = buildPriceRowHtml(override.mrp, override.price);
+      changed = true;
+    });
+    if (changed) render();
+  }
+
+  function fetchLiveData() {
     fetch(CONFIG.GAS_URL, { method: 'GET' })
       .then(function (res) { return res.json(); })
       .then(function (data) {
@@ -247,8 +273,11 @@ const Cart = (function () {
           outOfStockIds = new Set(data.outOfStock);
           applyStockStatus();
         }
+        if (data && data.prices) {
+          applyPriceOverrides(data.prices);
+        }
       })
-      .catch(function () { /* fail open: treat everything as in stock */ });
+      .catch(function () { /* fail open: keep local stock/price data */ });
   }
 
   function initSummaryToggle() {
@@ -282,7 +311,7 @@ const Cart = (function () {
     initCategoryNavScroll();
     initSummaryToggle();
     render();
-    fetchStockStatus();
+    fetchLiveData();
 
     const form = document.getElementById('order-form');
     form.addEventListener('input', renderSummary);

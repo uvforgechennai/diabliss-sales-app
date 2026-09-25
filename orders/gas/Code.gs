@@ -33,48 +33,52 @@ const PENDING_HEADERS = ['Razorpay Order ID', 'Created At', 'Order JSON', 'Diabl
 const STOCK_SHEET_NAME = 'Stock Status';
 const STOCK_HEADERS = ['Product ID', 'Product Name', 'In Stock'];
 
-// Keep this list in sync with the product IDs/names in js/products.js.
-// Used only to pre-fill the Stock Status sheet the first time it's created.
+const PRICE_SHEET_NAME = 'Prices';
+const PRICE_HEADERS = ['Product ID', 'Product Name', 'MRP', 'Selling Price'];
+
+// Keep this list in sync with the product IDs/names/MRPs in js/products.js.
+// Used only to pre-fill the Stock Status and Prices sheets the first time
+// they're created — after that, the sheets are the source of truth.
 const PRODUCT_REFERENCE = [
-  { id: 'sugar-40x5g', name: 'Sugar 40x5g Sachet Box' },
-  { id: 'sugar-500g', name: 'Sugar 500g Standy Pouch' },
-  { id: 'sugar-1kg', name: 'Sugar 1kg PET Jar' },
-  { id: 'sugar-1.75kg', name: 'Sugar 1.75kg PET Jar' },
-  { id: 'sugar-5kg', name: 'Sugar 5kg' },
-  { id: 'sugar-10kg', name: 'Sugar 10kg' },
-  { id: 'jaggery-500g', name: 'Jaggery 500g Standy Pouch' },
-  { id: 'jaggery-750g', name: 'Jaggery 750g PET Jar' },
-  { id: 'jaggery-1.25kg', name: 'Jaggery 1.25kg PET Jar' },
-  { id: 'jaggery-5kg', name: 'Jaggery 5kg Bag' },
-  { id: 'tea-lemon-10x10g', name: 'Lemon Tea 10x10g' },
-  { id: 'tea-lemon-30x10g', name: 'Lemon Tea 30x10g' },
-  { id: 'tea-lemon-500g', name: 'Lemon Tea 500g' },
-  { id: 'tea-combo-30x10g', name: 'Combo Tea 30x10g' },
-  { id: 'tea-ginger-10x10g', name: 'Ginger Tea 10x10g' },
-  { id: 'tea-masala-10x10g', name: 'Masala Chai 10x10g' },
-  { id: 'cookies-millets-120g', name: 'Millets Cookies 120g' },
-  { id: 'cookies-moringa-120g', name: 'Millets with Moringa Leaves Cookies 120g' },
-  { id: 'cookies-chia-120g', name: 'Millets with Chia Seeds Cookies 120g' },
-  { id: 'jam-mixed-fruit-225g', name: 'Mixed Fruit Jam 225g' },
-  { id: 'jam-guava-225g', name: 'Guava Jam 225g' },
-  { id: 'jam-pineapple-ginger-225g', name: 'Pineapple Ginger Jam 225g' },
-  { id: 'halwa-moong-dhal-225g', name: 'Moong Dhal Halwa 225g' },
-  { id: 'halwa-whole-wheat-225g', name: 'Whole Wheat Halwa 225g' },
-  { id: 'kheer-basmati-rice-225g', name: 'Basmati Rice Kheer 225g' },
-  { id: 'kheer-vermicilli-225g', name: 'Vermicilli Kheer 225g' },
-  { id: 'hw-glucose', name: 'Herbal Water - Blood Glucose Support' },
-  { id: 'hw-bp', name: 'Herbal Water - BP Support' },
-  { id: 'hw-hair', name: 'Herbal Water - Hair Care' },
-  { id: 'hw-skin', name: 'Herbal Water - Skin Care' },
-  { id: 'hw-immunity', name: 'Herbal Water - Immunity' }
+  { id: 'sugar-40x5g', name: 'Sugar 40x5g Sachet Box', mrp: 99 },
+  { id: 'sugar-500g', name: 'Sugar 500g Standy Pouch', mrp: 160 },
+  { id: 'sugar-1kg', name: 'Sugar 1kg PET Jar', mrp: 295 },
+  { id: 'sugar-1.75kg', name: 'Sugar 1.75kg PET Jar', mrp: 499 },
+  { id: 'sugar-5kg', name: 'Sugar 5kg', mrp: 1250 },
+  { id: 'sugar-10kg', name: 'Sugar 10kg', mrp: 2300 },
+  { id: 'jaggery-500g', name: 'Jaggery 500g Standy Pouch', mrp: 160 },
+  { id: 'jaggery-750g', name: 'Jaggery 750g PET Jar', mrp: 225 },
+  { id: 'jaggery-1.25kg', name: 'Jaggery 1.25kg PET Jar', mrp: 365 },
+  { id: 'jaggery-5kg', name: 'Jaggery 5kg Bag', mrp: 1250 },
+  { id: 'tea-lemon-10x10g', name: 'Lemon Tea 10x10g', mrp: 76 },
+  { id: 'tea-lemon-30x10g', name: 'Lemon Tea 30x10g', mrp: 201 },
+  { id: 'tea-lemon-500g', name: 'Lemon Tea 500g', mrp: 241 },
+  { id: 'tea-combo-30x10g', name: 'Combo Tea 30x10g', mrp: 223 },
+  { id: 'tea-ginger-10x10g', name: 'Ginger Tea 10x10g', mrp: 89 },
+  { id: 'tea-masala-10x10g', name: 'Masala Chai 10x10g', mrp: 89 },
+  { id: 'cookies-millets-120g', name: 'Millets Cookies 120g', mrp: 80 },
+  { id: 'cookies-moringa-120g', name: 'Millets with Moringa Leaves Cookies 120g', mrp: 89 },
+  { id: 'cookies-chia-120g', name: 'Millets with Chia Seeds Cookies 120g', mrp: 89 },
+  { id: 'jam-mixed-fruit-225g', name: 'Mixed Fruit Jam 225g', mrp: 215 },
+  { id: 'jam-guava-225g', name: 'Guava Jam 225g', mrp: 225 },
+  { id: 'jam-pineapple-ginger-225g', name: 'Pineapple Ginger Jam 225g', mrp: 235 },
+  { id: 'halwa-moong-dhal-225g', name: 'Moong Dhal Halwa 225g', mrp: 240 },
+  { id: 'halwa-whole-wheat-225g', name: 'Whole Wheat Halwa 225g', mrp: 199 },
+  { id: 'kheer-basmati-rice-225g', name: 'Basmati Rice Kheer 225g', mrp: 199 },
+  { id: 'kheer-vermicilli-225g', name: 'Vermicilli Kheer 225g', mrp: 199 },
+  { id: 'hw-glucose', name: 'Herbal Water - Blood Glucose Support', mrp: 450 },
+  { id: 'hw-bp', name: 'Herbal Water - BP Support', mrp: 450 },
+  { id: 'hw-hair', name: 'Herbal Water - Hair Care', mrp: 675 },
+  { id: 'hw-skin', name: 'Herbal Water - Skin Care', mrp: 675 },
+  { id: 'hw-immunity', name: 'Herbal Water - Immunity', mrp: 400 }
 ];
 
 function doGet(e) {
   try {
-    return jsonResponse_({ status: 'ok', outOfStock: getOutOfStockIds_() });
+    return jsonResponse_({ status: 'ok', outOfStock: getOutOfStockIds_(), prices: getPriceOverrides_() });
   } catch (err) {
     Logger.log('doGet error: ' + err);
-    return jsonResponse_({ status: 'error', message: String(err), outOfStock: [] });
+    return jsonResponse_({ status: 'error', message: String(err), outOfStock: [], prices: {} });
   }
 }
 
@@ -105,6 +109,42 @@ function getOrCreateStockSheet_() {
     sheet.getRange(2, 1, rows.length, 3).setValues(rows);
     sheet.getRange(2, 3, rows.length, 1).insertCheckboxes();
     sheet.autoResizeColumns(1, 2);
+  }
+  return sheet;
+}
+
+/**
+ * Reads product-level prices from the "Prices" sheet, self-created on first
+ * use so it can be edited anytime without a code change or redeploy.
+ * Returns { [productId]: { mrp, price } } for rows with valid numbers.
+ */
+function getPriceOverrides_() {
+  const sheet = getOrCreatePriceSheet_();
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return {};
+
+  const data = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
+  const overrides = {};
+  data.forEach(function (row) {
+    const id = row[0];
+    const mrp = Number(row[2]);
+    const price = Number(row[3]);
+    if (id && isFinite(mrp) && mrp > 0 && isFinite(price) && price >= 0) {
+      overrides[id] = { mrp: mrp, price: price };
+    }
+  });
+  return overrides;
+}
+
+function getOrCreatePriceSheet_() {
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  let sheet = ss.getSheetByName(PRICE_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(PRICE_SHEET_NAME);
+    sheet.appendRow(PRICE_HEADERS);
+    const rows = PRODUCT_REFERENCE.map(function (p) { return [p.id, p.name, p.mrp, p.mrp]; });
+    sheet.getRange(2, 1, rows.length, 4).setValues(rows);
+    sheet.autoResizeColumns(1, 4);
   }
   return sheet;
 }

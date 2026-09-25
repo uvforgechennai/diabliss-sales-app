@@ -139,41 +139,29 @@ Commit and push this change so it goes live.
 
 ### 5b. Also mirror it at diabliss.in/orders
 
-⚠️ **This repo also contains the unrelated field-sales app at its root.**
-Hostinger's Git deploy clones the *entire* repository into whatever
-directory you give it — it does not let you deploy just the `orders/`
-subfolder on its own. To avoid touching the existing diabliss.in site or
-exposing the sales-app code, deploy the repo **outside** the public web
-root, then symlink only the `orders/` folder into `public_html`. Never
-point the Git deploy's destination directly at `public_html` or
-`public_html/orders`.
+Since this repo's root also holds the unrelated field-sales app,
+`orders/` is mirrored into its own dedicated repo,
+[`uvforgechennai/diabliss-orders`](https://github.com/uvforgechennai/diabliss-orders),
+via `.github/workflows/mirror-orders.yml` — every push to `main` that
+touches `orders/**` (excluding `orders/gas/**`) auto-syncs into that
+repo's `main`. Deploy **that** repo to diabliss.in instead of this one, so
+none of the sales-app code ever touches diabliss.in's server:
 
-1. In Hostinger, switch to the **diabliss.in hosting account** (same login,
-   separate hPanel from the lowgifoods.co.in one).
-2. Go to **Advanced → Git** and add a repository:
-   - Repository URL: this repo's GitHub URL (same deploy key/token as
-     lowgifoods.co.in).
-   - Branch: `main`.
-   - Install/destination path: a folder **outside** `public_html`, e.g.
-     `repos/diabliss-sales-app` (check with Hostinger support/docs for the
-     exact non-web-accessible path on your plan — it must not be inside
-     `public_html`).
-3. Enable **auto-deploy on push**, then trigger an initial manual deploy and
-   confirm the folder now contains the repo (including its existing
-   `orders/` subfolder), with nothing yet changed in `public_html`.
-4. Via hPanel's **File Manager** or SSH, create a symlink:
-   ```bash
-   ln -s ~/repos/diabliss-sales-app/orders ~/public_html/orders
-   ```
-   (adjust paths to match step 2). This adds a single new `orders` entry
-   inside `public_html` without modifying or removing anything else
-   already there.
-5. Visit `diabliss.in/orders` to confirm it loads, then separately confirm
-   the existing `diabliss.in` site still loads normally and is untouched.
+1. In Hostinger, switch to the **diabliss.in hosting account**.
+2. Go to **Advanced → Git** and add `uvforgechennai/diabliss-orders` as
+   the repository, branch `main`, install path `public_html/orders`.
+   Since that repo's root *is* the order-portal content, this is safe to
+   deploy directly — no symlink workaround needed.
+3. Enable **auto-deploy on push**, trigger an initial manual deploy, then
+   visit `diabliss.in/orders` to confirm it loads (and that the rest of
+   the existing `diabliss.in` site is untouched).
 
-From then on, every push to `main` updates the cloned copy, and the symlink
-means `diabliss.in/orders` picks up the change immediately — while
-`lowgifoods.co.in/orders` keeps deploying independently per Step 5.
+**One-time setup for the mirror workflow itself** (only needed once):
+create a GitHub fine-grained personal access token scoped to just the
+`diabliss-orders` repo with **Contents: read and write** permission, then
+add it as a secret named `ORDERS_MIRROR_TOKEN` in *this* repo's
+**Settings → Secrets and variables → Actions**. Continue editing
+`orders/` here as usual — changes mirror over automatically after that.
 
 ### 6. Add the live domain(s) to Razorpay
 

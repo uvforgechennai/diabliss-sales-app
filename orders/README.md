@@ -235,16 +235,17 @@ This does require the one-time clasp CI setup described in Step 2 if you
 haven't done that yet — once it's in place, this feature (and any future
 `Code.gs` change) deploys automatically on push.
 
-## Discount logic
+## Pricing and discounts
 
-- Orders under ₹300: no discount.
-- Orders ₹300 and above: 5% discount by default.
-- URL query param `?ref=vip10` / `?ref=vip15` / `?ref=vip20` overrides the
-  default and applies a flat 10% / 15% / 20% discount regardless of order
-  value.
-- Shipping is always free.
-- No coupon/discount code entry is shown anywhere in the UI — discounts are
-  applied silently based on order value or the `ref` URL parameter.
+Each product in `js/products.js` has both an `mrp` and a `price` (the
+selling price). The discount badge, strikethrough MRP, and cart/order
+totals are all calculated automatically from the gap between the two —
+there's no separate order-level discount rule or referral code anymore.
+
+To change a product's price, edit its `price` field in `js/products.js`
+(leave `mrp` as-is) and push — the discount percentage shown to customers
+updates itself. Set `price` equal to `mrp` to show no discount on that
+product. Shipping is always free.
 
 ## Local preview
 

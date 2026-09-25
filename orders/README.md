@@ -137,14 +137,34 @@ Commit and push this change so it goes live.
    live site.
 4. Trigger an initial manual deploy to confirm it pulls correctly.
 
-### 6. Add the live domain to Razorpay
+### 5b. Also mirror it at diabliss.in/orders
 
-Once `lowgifoods.co.in/orders` is live:
+The same repo/branch can auto-deploy to a second domain — no code or config
+changes needed, since the site has no hardcoded domain anywhere.
+
+1. In Hostinger, switch to the **diabliss.in hosting account** (same login,
+   separate hPanel from the lowgifoods.co.in one).
+2. Go to **Advanced → Git** and add a repository the same way as Step 5:
+   - Repository URL: this repo's GitHub URL (same deploy key/token).
+   - Branch: `main`.
+   - Install path: point it at (or symlink) the `orders/` folder to
+     `public_html/orders` under **this** account's document root, so it
+     serves at `diabliss.in/orders`.
+3. Enable **auto-deploy on push**, then trigger an initial manual deploy to
+   confirm it pulls correctly.
+
+From then on, every push to `main` updates both `lowgifoods.co.in/orders`
+and `diabliss.in/orders` at the same time, from the same source.
+
+### 6. Add the live domain(s) to Razorpay
+
+Once the site is live:
 
 1. Log in to the [Razorpay Dashboard](https://dashboard.razorpay.com).
 2. Go to **Settings → API Keys / Configuration** (or **Account & Settings
    → Website/App URLs**, depending on the account type) and add
-   `https://lowgifoods.co.in` as an authorized domain/origin.
+   **both** `https://lowgifoods.co.in` and `https://diabliss.in` as
+   authorized domains/origins.
 3. Confirm the account is live-mode enabled, since `RAZORPAY_KEY` in
    `js/config.js` is a **live** key (`rzp_live_...`), not a test key.
 

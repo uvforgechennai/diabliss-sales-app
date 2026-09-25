@@ -235,17 +235,33 @@ This does require the one-time clasp CI setup described in Step 2 if you
 haven't done that yet — once it's in place, this feature (and any future
 `Code.gs` change) deploys automatically on push.
 
-## Pricing and discounts
+## Managing prices (and discounts)
 
-Each product in `js/products.js` has both an `mrp` and a `price` (the
-selling price). The discount badge, strikethrough MRP, and cart/order
-totals are all calculated automatically from the gap between the two —
-there's no separate order-level discount rule or referral code anymore.
+Like stock, prices are editable anytime from a tab in the same Google
+Sheet — no code change or redeploy needed.
 
-To change a product's price, edit its `price` field in `js/products.js`
-(leave `mrp` as-is) and push — the discount percentage shown to customers
-updates itself. Set `price` equal to `mrp` to show no discount on that
-product. Shipping is always free.
+1. Open your **Diabliss Orders DB** Google Sheet.
+2. The first time the site is loaded after this feature is deployed, a new
+   tab called **"Prices"** is created automatically, pre-filled with every
+   product's ID, name, MRP, and Selling Price (selling price starts equal
+   to MRP, i.e. no discount shown).
+3. To put a product on sale: lower its **Selling Price** below its **MRP**.
+   The product card automatically shows the selling price, a
+   strikethrough MRP, and a "X% OFF" badge — the percentage is calculated
+   for you.
+4. To remove a discount: set **Selling Price** back equal to **MRP**.
+5. To change a product's MRP itself, edit the **MRP** column directly.
+
+That's it — the site reads this sheet every time someone loads the page.
+If the sheet can't be reached for any reason, it fails open (keeps
+whatever prices were last loaded) rather than blocking orders. There's no
+separate order-level discount rule or referral code anymore — every
+discount comes from the gap between MRP and Selling Price per product,
+and shipping is always free.
+
+This does require the one-time clasp CI setup described in Step 2 if you
+haven't done that yet — once it's in place, this feature (and any future
+`Code.gs` change) deploys automatically on push.
 
 ## Local preview
 

@@ -3,6 +3,9 @@ name: Pull Main App GAS Backend (one-time/manual)
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   pull:
     runs-on: ubuntu-latest

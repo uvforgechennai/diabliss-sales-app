@@ -1,4 +1,4 @@
-const CACHE="diabliss-v1.7.186",ASSETS=["./","./index.html","./Diabliss_Logo-01.png","./pricing.js?v=1.7.186","./app-core.js?v=1.7.186","./app-ui-helpers.js?v=1.7.186","./app-visit-flow.js?v=1.7.186","./app-admin-master.js?v=1.7.186","./app-dash-reports.js?v=1.7.186","./app-corrections.js?v=1.7.186","./app-targets-expenses.js?v=1.7.186","./app-ledger-invoice.js?v=1.7.186","./app-data-sync.js?v=1.7.186","./app-features-new.js?v=1.7.186","./app-features-v2.js?v=1.7.186","./app-chatbot.js?v=1.7.186","./mis-report.html"];self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(e=>e.addAll(ASSETS)).then(()=>self.skipWaiting()))}),self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(e=>Promise.all(e.filter(e=>e!==CACHE).map(e=>caches.delete(e)))).then(()=>self.clients.claim()))}),self.addEventListener("fetch",e=>{
+const CACHE="diabliss-v1.7.187",ASSETS=["./","./index.html","./Diabliss_Logo-01.png","./pricing.js?v=1.7.187","./app-core.js?v=1.7.187","./app-ui-helpers.js?v=1.7.187","./app-visit-flow.js?v=1.7.187","./app-admin-master.js?v=1.7.187","./app-dash-reports.js?v=1.7.187","./app-corrections.js?v=1.7.187","./app-targets-expenses.js?v=1.7.187","./app-ledger-invoice.js?v=1.7.187","./app-data-sync.js?v=1.7.187","./app-features-new.js?v=1.7.187","./app-features-v2.js?v=1.7.187","./app-chatbot.js?v=1.7.187","./mis-report.html"];self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(e=>e.addAll(ASSETS)).then(()=>self.skipWaiting()))}),self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(e=>Promise.all(e.filter(e=>e!==CACHE).map(e=>caches.delete(e)))).then(()=>self.clients.claim()))}),self.addEventListener("fetch",e=>{
   if("GET"!==e.request.method)return;
   const t=new URL(e.request.url),s=t.searchParams.get("action");
   if(t.pathname.includes("script.google.com")&&s&&["getFiles","getProductPhotos","getOfficerLocations","getCompanyFiles"].includes(s)){
@@ -6,8 +6,17 @@ const CACHE="diabliss-v1.7.186",ASSETS=["./","./index.html","./Diabliss_Logo-01.
     return;
   }
   if(t.pathname.includes("script.google.com")||t.pathname.includes("googleapis.com")||t.searchParams.has("action"))return;
-  if("navigate"===e.request.mode){
-    // App-shell fallback: on every page navigation (including a cold resume after
+  // Detect page-load requests several ways — "mode" alone isn't reliably reported
+  // as "navigate" by every Android WebView/Chrome build for an installed PWA, so
+  // a single-signal check can silently never fire on some devices.
+  const isPageLoad = "navigate"===e.request.mode
+    || "document"===e.request.destination
+    || (e.request.headers.get("accept")||"").includes("text/html")
+    || t.pathname===self.registration.scope.replace(location.origin,"")
+    || t.pathname.endsWith("/")
+    || t.pathname.endsWith("/index.html");
+  if(isPageLoad){
+    // App-shell fallback: on every page load (including a cold resume after
     // Android kills and restarts the webview), always try the network first, but
     // NEVER let a transient network/server failure show the user a raw error page
     // — fall back to the cached shell, which is always known-good.

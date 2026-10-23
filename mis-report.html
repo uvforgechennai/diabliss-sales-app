@@ -376,6 +376,14 @@ async function fetchFromSupabase(from, to) {
   return await res.json();
 }
 
+// Collapses "+91 98765 43210", "09876543210" and "9876543210" to the same key,
+// so one officer with inconsistently-formatted mobile numbers across orders
+// doesn't get split into separate report rows.
+function normMobile(m) {
+  const d = String(m||'').replace(/\D/g,'');
+  return d.slice(-10) || String(m||'').trim();
+}
+
 function buildReportFromRows(rows, from, to) {
   const hierarchy = {};
   const productMap = {};
@@ -386,7 +394,7 @@ function buildReportFromRows(rows, from, to) {
   rows.forEach(r => {
     if (!r.id) return;
     const terr = r.territory || 'Unknown';
-    const mobile = r.officer_mobile || r.officer || 'unknown';
+    const mobile = r.officer_mobile ? normMobile(r.officer_mobile) : (r.officer || 'unknown');
     const store = r.store || 'Unknown';
     const total = parseFloat(r.grand_total) || 0;
     const products = r.products || '';

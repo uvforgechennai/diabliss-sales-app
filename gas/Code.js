@@ -9,6 +9,10 @@ function nowIST() { return Utilities.formatDate(new Date(), TIMEZONE, 'dd/MM/yyy
 function nowISO_IST() { return Utilities.formatDate(new Date(), TIMEZONE, "yyyy-MM-dd'T'HH:mm:ss'+05:30'"); }
 function nowIST_() { return Utilities.formatDate(new Date(), TIMEZONE, 'dd MMM yyyy, hh:mm a'); }
 function todayIST_() { return Utilities.formatDate(new Date(), TIMEZONE, 'yyyy-MM-dd'); }
+// Normalizes a mobile number for use as a grouping/lookup key — strips everything but
+// digits and keeps the last 10, so "+91 98765 43210", "0919876543210" and "9876543210"
+// all collapse to the same key instead of splitting one officer into several report rows.
+function normMobile_(m) { const d = String(m||'').replace(/\D/g,''); return d.slice(-10) || String(m||'').trim(); }
 
 const SPREADSHEET_ID  = '1KUV-ypJjagfufmDfcaON1Kb0cqRqaN6OlQebD6xVQpE';
 const DRIVE_FOLDER_ID = '18-X2yLEzHJUY1uv5_HOIZddi6B4kZZXK';
@@ -555,7 +559,7 @@ function getOfficerDisplayNames() {
   for (let i = 1; i < rows.length; i++) {
     const mobile = String(rows[i][0]||'').trim();
     const name   = String(rows[i][1]||'').trim();
-    if (mobile && name) map[mobile] = name;
+    if (mobile && name) map[normMobile_(mobile)] = name;
   }
   return map;
 }
@@ -600,13 +604,13 @@ function getMISDetail(fromStr, toStr) {
   const locMap = {};
   if (from === to && from === todayIST_()) {
     const locData = getOfficerLocations(from);
-    locData.forEach(l => { locMap[l.mobile] = l.kmToday; });
+    locData.forEach(l => { locMap[normMobile_(l.mobile)] = l.kmToday; });
   }
 
   filtered.forEach(r => {
     const terr    = String(r[ORDER_COL.territory]||'Unknown').trim()||'Unknown';
     const officer = String(r[ORDER_COL.officer]||'Unassigned').trim();
-    const mobile  = String(r[ORDER_COL.officerMobile]||'').trim();
+    const mobile  = normMobile_(String(r[ORDER_COL.officerMobile]||'').trim());
     const store   = String(r[ORDER_COL.store]||'Unknown').trim();
     const dist    = String(r[ORDER_COL.distributor]||'').trim();
     const city    = String(r[ORDER_COL.storeCity]||'').trim();
@@ -1828,7 +1832,7 @@ function computeMISData(type) {
   filtered.forEach(({row: r}) => {
     const terr = String(terrCol>=0?r[terrCol]:'Unknown').trim()||'Unknown';
     const rawOfficer = String(offCol>=0?r[offCol]:'').trim()||'Unassigned';
-    const mobile = String(mobileCol>=0?r[mobileCol]:'').trim();
+    const mobile = normMobile_(String(mobileCol>=0?r[mobileCol]:'').trim());
     const key = mobile || rawOfficer; // prefer mobile as dedup key
     const store = String(storeCol>=0?r[storeCol]:'').trim()||'Unknown store';
     const dist = String(distCol>=0?r[distCol]:'').trim();
@@ -1862,7 +1866,7 @@ function computeMISData(type) {
         const asmMobile = String(r[2]||'').trim();
         const m = remarks.match(/Accompanying: ([^(]+) \(([^)]+)\)/);
         if (m) {
-          const accompMobile = m[2].trim();
+          const accompMobile = normMobile_(m[2].trim());
           const asmName = String(r[1]||'').trim();
           accompMap[accompMobile] = asmName;
         }

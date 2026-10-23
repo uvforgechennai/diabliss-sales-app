@@ -1,0 +1,38 @@
+name: Pull Main App GAS Backend (one-time/manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install clasp
+        run: npm install -g @google/clasp
+
+      - name: Write clasp credentials
+        run: echo '${{ secrets.CLASP_CREDENTIALS }}' > ~/.clasprc.json
+
+      - name: Pull current script from Apps Script
+        working-directory: gas
+        run: clasp pull
+
+      - name: List deployments (for reference)
+        working-directory: gas
+        run: clasp deployments || true
+
+      - name: Commit pulled files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add gas/
+          git diff --cached --quiet || git commit -m "Pull current main app GAS backend via clasp"
+          git push

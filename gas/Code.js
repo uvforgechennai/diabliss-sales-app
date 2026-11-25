@@ -16,7 +16,7 @@ function normMobile_(m) { const d = String(m||'').replace(/\D/g,''); return d.sl
 
 const SPREADSHEET_ID  = '1KUV-ypJjagfufmDfcaON1Kb0cqRqaN6OlQebD6xVQpE';
 const DRIVE_FOLDER_ID = '18-X2yLEzHJUY1uv5_HOIZddi6B4kZZXK';
-const WEB_APP_URL     = 'https://script.google.com/macros/s/AKfycbzznExu7LAHKDdsTuSIWr4wSAwCojqpDeKKwbCTZBO3Al-Zci244jva788dTFWz74Hf/exec';
+const WEB_APP_URL     = 'https://script.google.com/macros/s/AKfycbzUWaomaTBhuUyce2HZ44o8I3m2Q1Nl7pEpat6qFPpE1cWZZDh18OeGN9RYted2a6hv/exec';
 const REPORT_PAGE_URL = 'https://lowgifoods.co.in/diabliss-sales-app/mis-report.html';
 
 const SHEET_ORDERS     = 'Orders';

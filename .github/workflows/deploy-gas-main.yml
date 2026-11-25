@@ -34,5 +34,5 @@ jobs:
         working-directory: gas
         run: |
           clasp deploy \
-            --deploymentId "AKfycbzznExu7LAHKDdsTuSIWr4wSAwCojqpDeKKwbCTZBO3Al-Zci244jva788dTFWz74Hf" \
+            --deploymentId "AKfycbzUWaomaTBhuUyce2HZ44o8I3m2Q1Nl7pEpat6qFPpE1cWZZDh18OeGN9RYted2a6hv" \
             --description "Auto-deploy from GitHub Actions ($(date -u +%Y-%m-%dT%H:%M:%SZ)) — ${{ github.sha }}"

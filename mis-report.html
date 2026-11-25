@@ -365,15 +365,29 @@ const TERR_COLORS = ['#159ADB','#1E8449','#E67E22','#9B59B6','#E74C3C','#1ABC9C'
 
 /* ── SUPABASE QUERY ── */
 async function fetchFromSupabase(from, to) {
-  const url = SUPABASE_URL + '/rest/v1/orders?select=*&order_date=gte.' + from + '&order_date=lte.' + to + '&order=order_date.asc&limit=5000';
-  const res = await fetch(url, {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY
-    }
-  });
-  if (!res.ok) throw new Error('Supabase error: ' + res.status);
-  return await res.json();
+  const url = SUPABASE_URL + '/rest/v1/orders?select=*&order_date=gte.' + from + '&order_date=lte.' + to + '&order=order_date.asc';
+  // Supabase/PostgREST hard-caps every response at 1000 rows regardless of
+  // any limit= in the URL, with no partial-content signal — so a date range
+  // with more than 1000 orders (e.g. a busy month) was silently missing
+  // everything past the first page. Paginate via Range until a page comes
+  // back short (end of data) or the safety cap is hit.
+  const PAGE = 1000, MAX_PAGES = 10;
+  let all = [];
+  for (let p = 0; p < MAX_PAGES; p++) {
+    const start = p * PAGE, end = start + PAGE - 1;
+    const res = await fetch(url, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Range': start + '-' + end
+      }
+    });
+    if (!res.ok) throw new Error('Supabase error: ' + res.status);
+    const page = await res.json();
+    all = all.concat(page);
+    if (page.length < PAGE) break;
+  }
+  return all;
 }
 
 // Collapses "+91 98765 43210", "09876543210" and "9876543210" to the same key,

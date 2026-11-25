@@ -20,10 +20,23 @@ function _sbTsToIso(date,time,syncedAt){
 async function _fetchOrdersFromSupabase(){
   const cutoff=new Date();cutoff.setDate(cutoff.getDate()-90);
   const from=cutoff.toISOString().slice(0,10);
-  const url=SB_URL+'/rest/v1/orders?select=*&order_date=gte.'+from+'&order=synced_at.desc&limit=5000';
-  const r=await fetch(url,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},signal:_timeoutSignal(8000)});
-  if(!r.ok)throw new Error('SB '+r.status);
-  return (await r.json()).map(_sbRowToOrder);
+  const url=SB_URL+'/rest/v1/orders?select=*&order_date=gte.'+from+'&order=synced_at.desc';
+  // Supabase/PostgREST hard-caps every response at 1000 rows regardless of
+  // any limit= in the URL, with no partial-content signal — so a date range
+  // with more than 1000 orders (e.g. a full month at current volume) was
+  // silently missing everything past the first page. Paginate via Range
+  // until a page comes back short (end of data) or the safety cap is hit.
+  const PAGE=1000,MAX_PAGES=10;
+  let all=[];
+  for(let p=0;p<MAX_PAGES;p++){
+    const start=p*PAGE,end=start+PAGE-1;
+    const r=await fetch(url,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Range':start+'-'+end},signal:_timeoutSignal(10000)});
+    if(!r.ok)throw new Error('SB '+r.status);
+    const page=await r.json();
+    all=all.concat(page);
+    if(page.length<PAGE)break;
+  }
+  return all.map(_sbRowToOrder);
 }
 
 let _orderFetchInFlight = null, _lastOrderFetch = 0;

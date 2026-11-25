@@ -27,7 +27,7 @@ jobs:
 
       - name: Broadcast force-refresh to installed apps
         run: |
-          curl -sS -X POST 'https://script.google.com/macros/s/AKfycbzznExu7LAHKDdsTuSIWr4wSAwCojqpDeKKwbCTZBO3Al-Zci244jva788dTFWz74Hf/exec' \
+          curl -sS -X POST 'https://script.google.com/macros/s/AKfycbzUWaomaTBhuUyce2HZ44o8I3m2Q1Nl7pEpat6qFPpE1cWZZDh18OeGN9RYted2a6hv/exec' \
             -H 'Content-Type: text/plain' \
             -d '{"action":"sendForceRefresh","broadcast":true}' \
             || true

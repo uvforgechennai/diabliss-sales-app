@@ -71,7 +71,7 @@ async function fetchAndCacheOrders(){
         let data=null;
         for(let i=0;i<2&&!data;i++){
           try{
-            const r=await fetch(gasGetUrl(SCRIPT_URL+'?action=getOrders&territory='+encodeURIComponent(territory)),{signal:_timeoutSignal(15000)});
+            const r=await fetch(gasGetUrl(SCRIPT_URL+'?action=getOrders&territory='+encodeURIComponent(territory)),{signal:_timeoutSignal(30000)});
             data=await r.json();
           }catch(e){if(i===0)await new Promise(res=>setTimeout(res,1000));}
         }

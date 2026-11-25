@@ -12,7 +12,7 @@ function _sbRowToOrder(r){
 async function _fetchOrdersFromSupabase(){
   const cutoff=new Date();cutoff.setDate(cutoff.getDate()-90);
   const from=cutoff.toISOString().slice(0,10);
-  const url=SB_URL+'/rest/v1/orders?select=*&order_date=gte.'+from+'&order=synced_at.asc&limit=5000';
+  const url=SB_URL+'/rest/v1/orders?select=*&order_date=gte.'+from+'&order=synced_at.desc&limit=5000';
   const r=await fetch(url,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},signal:_timeoutSignal(8000)});
   if(!r.ok)throw new Error('SB '+r.status);
   return (await r.json()).map(_sbRowToOrder);

@@ -2652,10 +2652,18 @@ function handleChatbot(data) {
       muteHttpExceptions: true,
       deadline: 30
     });
-    var parsed = JSON.parse(res.getContentText());
+    var rawText = res.getContentText();
+    var parsed = JSON.parse(rawText);
     var reply = parsed.choices && parsed.choices[0] && parsed.choices[0].message && parsed.choices[0].message.content
       ? parsed.choices[0].message.content.trim()
       : '';
+    if (!reply) {
+      dbg('handleChatbot: no reply, groq_code=' + res.getResponseCode() + ' body=' + rawText.substring(0, 400));
+      var errMsg = (parsed.error && parsed.error.message) || ('Unexpected response (HTTP ' + res.getResponseCode() + ')');
+      return ContentService.createTextOutput(
+        JSON.stringify({status:'error', result: 'Groq error: ' + errMsg})
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
     return ContentService.createTextOutput(
       JSON.stringify({status:'ok', result: reply})
     ).setMimeType(ContentService.MimeType.JSON);
